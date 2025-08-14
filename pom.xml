@@ -264,7 +264,6 @@
 				<groupId>com.github.spotbugs</groupId>
 				<artifactId>spotbugs-maven-plugin</artifactId>
 				<configuration>
-					<xmlOutput>true</xmlOutput>
 					<plugins>
 						<plugin>
 							<groupId>com.h3xstream.findsecbugs</groupId>
@@ -275,10 +274,9 @@
 				</configuration>
 				<executions>
 					<execution>
-						<id>spotbugs</id>
-						<phase>verify</phase>
+						<id>check</id>
 						<goals>
-							<goal>spotbugs</goal>
+							<goal>check</goal>
 						</goals>
 					</execution>
 				</executions>
