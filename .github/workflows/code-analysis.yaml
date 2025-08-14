@@ -34,4 +34,4 @@ jobs:
       - name: Build and analyze
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn -B verify org.sonarsource.scanner.maven:5.1.0.4751:sonar-maven-plugin:sonar -Dsonar.projectKey=pgmarc_space-java-client
+        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:5.1.0.4751:sonar -Dsonar.projectKey=pgmarc_space-java-client
