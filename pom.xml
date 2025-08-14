@@ -176,7 +176,12 @@
 							<version>4.9.4</version>
 						</dependency>
 					</dependencies>
-				</plugin>				
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-pmd-plugin</artifactId>
+					<version>3.27.0</version>
+      			</plugin>				
 			</plugins>
     	</pluginManagement>
 		<plugins>
@@ -281,6 +286,28 @@
 					</execution>
 				</executions>
         	</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-pmd-plugin</artifactId>
+				<configuration>
+					<includeXmlInReports>true</includeXmlInReports>
+					<linkXRef>false</linkXRef>
+				</configuration>
+				<executions>
+					<execution>
+						<id>check</id>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>cpd-check</id>
+						<goals>
+							<goal>cpd-check</goal>
+						</goals>
+					</execution>
+				</executions>
+      		</plugin>
 		</plugins>
 	</build>
 
