@@ -42,7 +42,10 @@
 	</scm>
 
 	<properties>
-        <maven.compiler.release>11</maven.compiler.release>
+		<sonar.organization>pgmarc</sonar.organization>
+		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.release>11</maven.compiler.release>
 		<okhttp.version>5.1.0</okhttp.version>
         <socket.io-client.version>2.1.2</socket.io-client.version>
         <org.json.version>20250517</org.json.version>
@@ -142,6 +145,24 @@
 	</dependencies>
 
 	<build>
+		<!--
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-checkstyle-plugin</artifactId>
+					<version>3.6.0</version>
+					<dependencies>
+						<dependency>
+						<groupId>com.puppycrawl.tools</groupId>
+						<artifactId>checkstyle</artifactId>
+						<version>10.26.1</version>
+						</dependency>
+					</dependencies>
+				</plugin>
+			</plugins>
+    	</pluginManagement>
+		-->
 		<plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -180,22 +201,6 @@
 				</executions>
 			</plugin>
             <plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-gpg-plugin</artifactId>
-				<version>3.2.8</version>
-				<executions>
-					<execution>
-						<id>sign-artifacts</id>
-						<phase>verify</phase>
-						<goals>
-							<goal>sign</goal>
-						</goals>
-						<configuration>
-					</configuration>
-					</execution>
-				</executions>
-			</plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
                 <version>3.6.1</version>
@@ -220,6 +225,27 @@
                     </execution>
                 </executions>                
             </plugin>
+			<!--
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<configuration>
+					<configLocation>google_checks.xml</configLocation>
+					<consoleOutput>true</consoleOutput>
+					<failsOnError>true</failsOnError>
+					<linkXRef>false</linkXRef>
+				</configuration>
+				<executions>
+					<execution>
+						<id>validate</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			-->		
 		</plugins>
 	</build>
 </project>
