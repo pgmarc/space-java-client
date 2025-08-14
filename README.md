@@ -1,3 +1,4 @@
 # HTTP RESTful API for SPACE
 
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/52eb257ac19a485fa6be09836fc60801)](https://app.codacy.com/gh/pgmarc/space-java-client/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=pgmarc_space-java-client&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=pgmarc_space-java-client)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=pgmarc_space-java-client&metric=coverage)](https://sonarcloud.io/summary/new_code?id=pgmarc_space-java-client)
