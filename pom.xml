@@ -145,7 +145,6 @@
 	</dependencies>
 
 	<build>
-		<!--
 		<pluginManagement>
 			<plugins>
 				<plugin>
@@ -154,15 +153,14 @@
 					<version>3.6.0</version>
 					<dependencies>
 						<dependency>
-						<groupId>com.puppycrawl.tools</groupId>
-						<artifactId>checkstyle</artifactId>
-						<version>10.26.1</version>
+							<groupId>com.puppycrawl.tools</groupId>
+							<artifactId>checkstyle</artifactId>
+							<version>10.26.1</version>
 						</dependency>
 					</dependencies>
 				</plugin>
 			</plugins>
     	</pluginManagement>
-		-->
 		<plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -248,4 +246,38 @@
 			-->		
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>coverage</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.jacoco</groupId>
+						<artifactId>jacoco-maven-plugin</artifactId>
+						<version>0.8.13</version>
+						<executions>
+							<execution>
+								<id>prepare-agent</id>
+								<goals>
+									<goal>prepare-agent</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>report</id>
+								<goals>
+									<goal>report</goal>
+								</goals>
+								<configuration>
+									<formats>
+										<format>XML</format>
+									</formats>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
