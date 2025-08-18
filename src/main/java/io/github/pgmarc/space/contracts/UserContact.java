@@ -7,10 +7,10 @@ public final class UserContact {
 
     private final String userId;
     private final String username;
-    private String firstName;
-    private String lastName;
-    private String email;
-    private String phone;
+    private final String firstName;
+    private final String lastName;
+    private final String email;
+    private final String phone;
 
     private UserContact(Builder builder) {
         this.userId = builder.userId;
@@ -22,8 +22,9 @@ public final class UserContact {
     }
 
     public static Builder builder(String userId, String username) {
-        return new Builder(Objects.requireNonNull(userId, "userId must not be null"),
-                validateUsername(Objects.requireNonNull(username, "username must not be null")));
+        Objects.requireNonNull(userId, "userId must not be null");
+        Objects.requireNonNull(username, "username must not be null");
+        return new Builder(userId, username);
     }
 
     public String getUserId() {
@@ -48,20 +49,6 @@ public final class UserContact {
 
     public Optional<String> getPhone() {
         return Optional.ofNullable(phone);
-    }
-
-    private static String validateUsername(String username) {
-        if (username.isBlank()) {
-            throw new IllegalArgumentException("username is blank");
-        }
-
-        int length = username.length();
-        if (length < 3 || length > 30) {
-            throw new IllegalArgumentException("username must be between 3 and 30 characters. Current " + username
-                    + " has " + length + "characters");
-        }
-
-        return username;
     }
 
     @Override
@@ -130,7 +117,20 @@ public final class UserContact {
         }
 
         public UserContact build() {
+            if (username.isBlank()) {
+                throw new IllegalArgumentException("username is blank");
+            }
+            validateUserNameLength();
             return new UserContact(this);
+        }
+
+        private void validateUserNameLength() {
+            int length = this.username.length();
+            boolean isValidLength = length >= 3 && length <= 30;
+            if (!isValidLength) {
+                throw new IllegalArgumentException("username must be between 3 and 30 characters. Current " + username
+                        + " has " + length + "characters");
+            }
         }
     }
 
