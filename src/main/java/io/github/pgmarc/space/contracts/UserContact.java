@@ -3,7 +3,11 @@ package io.github.pgmarc.space.contracts;
 import java.util.Objects;
 import java.util.Optional;
 
-public final class UserContact {
+import org.json.JSONObject;
+
+import io.github.pgmarc.space.Jsonable;
+
+public final class UserContact implements Jsonable {
 
     private final String userId;
     private final String username;
@@ -132,6 +136,40 @@ public final class UserContact {
                         + " has " + length + "characters");
             }
         }
+    }
+
+    private enum JsonKeys {
+
+        USER_ID("userId"),
+        USERNAME("username"),
+        FIRST_NAME("firstName"),
+        LAST_NAME("lastName"),
+        EMAIL("email"),
+        PHONE("phone");
+
+        private final String name;
+
+        private JsonKeys(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
+    @Override
+    public JSONObject toJson() {
+        JSONObject obj = new JSONObject()
+                .put(JsonKeys.USER_ID.toString(), userId)
+                .put(JsonKeys.USERNAME.toString(), username)
+                .putOpt(JsonKeys.FIRST_NAME.toString(), firstName)
+                .putOpt(JsonKeys.LAST_NAME.toString(), lastName)
+                .putOpt(JsonKeys.EMAIL.toString(), email)
+                .putOpt(JsonKeys.PHONE.toString(), phone);
+
+        return obj;
     }
 
 }
