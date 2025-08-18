@@ -43,7 +43,7 @@ class UserContactTest {
     @ValueSource(strings = { "", "ab", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" })
     void givenInvalidUsernamesShouldThrow(String username) {
 
-        assertThrows(IllegalArgumentException.class, () -> UserContact.builder("123456789", username));
+        assertThrows(IllegalArgumentException.class, () -> UserContact.builder("123456789", username).build());
     }
 
     // Using pairwise testing
