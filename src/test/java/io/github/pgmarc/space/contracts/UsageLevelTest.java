@@ -1,0 +1,60 @@
+package io.github.pgmarc.space.contracts;
+
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.time.LocalDateTime;
+
+import org.junit.jupiter.api.Test;
+
+class UsageLevelTest {
+
+    @Test
+    void givenNonRenewableUsageLimitShouldCreate() {
+
+        String serviceName = "petclinic";
+        String usageLimitName = "maxPets";
+        double consumption = 5;
+        UsageLevel usageLevel = UsageLevel.nonRenewable(serviceName, usageLimitName, consumption);
+
+        assertAll(
+                () -> assertEquals(serviceName, usageLevel.getServiceName()),
+                () -> assertEquals(usageLimitName, usageLevel.getName()),
+                () -> assertEquals(consumption, usageLevel.getConsumption()),
+                () -> assertFalse(usageLevel.isRenewableUsageLimit()));
+    }
+
+    @Test
+    void givenInvalidParamertersShouldThrow() {
+
+        String serviceName = "petclinic";
+        String usageLimitName = "maxPets";
+        double consumption = 5;
+
+        assertAll(
+                () -> assertThrows(NullPointerException.class, () -> UsageLevel.nonRenewable(null, usageLimitName, consumption)),
+                () -> assertThrows(NullPointerException.class, () -> UsageLevel.nonRenewable(serviceName, null, consumption)),
+                () -> assertThrows(IllegalArgumentException.class, () -> UsageLevel.nonRenewable(serviceName, usageLimitName, -1)));
+    }
+
+    @Test
+    void givenRenewableUsageLimitShouldCreate() {
+
+        String serviceName = "Petclinic AI";
+        String usageLimitName = "maxTokens";
+        double consumption = 300;
+        LocalDateTime resetTimestamp = LocalDateTime.of(2025, 8, 19, 0, 0);
+        UsageLevel usageLevel = UsageLevel.renewable(serviceName, usageLimitName, consumption, resetTimestamp);
+
+        assertAll(
+                () -> assertEquals(serviceName, usageLevel.getServiceName()),
+                () -> assertEquals(usageLimitName, usageLevel.getName()),
+                () -> assertEquals(consumption, usageLevel.getConsumption()),
+                () -> assertEquals(resetTimestamp, usageLevel.getResetTimestamp().get()),
+                () -> assertTrue(usageLevel.isRenewableUsageLimit()));
+    }
+
+}
