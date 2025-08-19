@@ -2,8 +2,10 @@ package io.github.pgmarc.space.contracts;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -15,18 +17,21 @@ public final class Subscription {
     private final Map<String, Service> services;
     private final LocalDateTime startDate;
     private final LocalDateTime endDate;
-    private Duration renewalDays;
+    private final Duration renewalDays;
+    private final List<SubscriptionSnapshot> history;
 
     private Subscription(Builder builder) {
+        this.userContact = builder.userContact;
         this.startDate = builder.startDate;
         this.endDate = builder.endDate;
-        this.userContact = builder.userContact;
-        this.services = Collections.unmodifiableMap(builder.services);
         this.renewalDays = builder.renewalDays;
+        this.services = Collections.unmodifiableMap(builder.services);
+        this.history = Collections.unmodifiableList(builder.history);
     }
 
-    public static Builder builder(UserContact userContact, LocalDateTime startDate, LocalDateTime endDate) {
-        return new Builder(userContact, startDate, endDate);
+    public static Builder builder(UserContact userContact, LocalDateTime startDate, LocalDateTime endDate,
+            Service service) {
+        return new Builder(userContact, startDate, endDate).subscribe(service);
     }
 
     public LocalDateTime getStartDate() {
@@ -61,8 +66,16 @@ public final class Subscription {
         return Optional.ofNullable(this.services.get(serviceName));
     }
 
+    public Map<String, Service> getServicesMap() {
+        return services;
+    }
+
     public Set<Service> getServices() {
         return Set.copyOf(services.values());
+    }
+
+    public List<SubscriptionSnapshot> getHistory() {
+        return history;
     }
 
     public static final class Builder {
@@ -71,6 +84,7 @@ public final class Subscription {
         private final LocalDateTime endDate;
         private final UserContact userContact;
         private final Map<String, Service> services = new HashMap<>();
+        private final List<SubscriptionSnapshot> history = new ArrayList<>();
         private Duration renewalDays;
 
         private Builder(UserContact userContact, LocalDateTime startDate, LocalDateTime endDate) {
@@ -92,15 +106,18 @@ public final class Subscription {
             return this;
         }
 
+        Builder addSnapshot(Subscription subscription) {
+            Objects.requireNonNull(subscription, "subscription must not be null");
+            this.history.add(SubscriptionSnapshot.of(subscription));
+            return this;
+        }
+
         public Subscription build() {
             Objects.requireNonNull(startDate, "startDate must not be null");
             Objects.requireNonNull(endDate, "endDate must not be null");
             Objects.requireNonNull(userContact, "userContact must not be null");
             if (startDate.isAfter(endDate)) {
                 throw new IllegalStateException("startDate is after endDate");
-            }
-            if (services.isEmpty()) {
-                throw new IllegalStateException("You have to be subscribed at least to a plan or an add-on");
             }
             return new Subscription(this);
         }
