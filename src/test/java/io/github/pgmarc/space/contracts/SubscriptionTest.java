@@ -15,9 +15,9 @@ import org.junit.jupiter.api.Test;
 
 class SubscriptionTest {
 
-    private static final UserContact userContact = UserContact.builder("123456789", "alexdoe")
+    private static final UserContact TEST_USER_CONTACT = UserContact.builder("123456789", "alexdoe")
             .build();
-    private static final Service service = Service.builder("test", "alfa").plan("Foo").build();
+    private static final Service TEST_SERVICE = Service.builder("test", "alfa").plan("Foo").build();
 
     private static final LocalDateTime START = LocalDateTime.of(2025, 8, 15, 0, 0);
 
@@ -35,7 +35,7 @@ class SubscriptionTest {
         Service service2 = Service.builder(service2Name, "v2").plan("PLATINUM").build();
 
         Subscription sub = Subscription
-                .builder(userContact, START, END, service1)
+                .builder(TEST_USER_CONTACT, START, END, service1)
                 .subscribe(service2)
                 .renewIn(Duration.ofDays(renewalDays))
                 .build();
@@ -55,17 +55,17 @@ class SubscriptionTest {
     void whenNoRequiredParametersInputShouldThrow() {
 
         Exception ex = assertThrows(NullPointerException.class,
-                () -> Subscription.builder(null, START, END, service)
+                () -> Subscription.builder(null, START, END, TEST_SERVICE)
                         .build());
         assertEquals("userContact must not be null", ex.getMessage());
 
         ex = assertThrows(NullPointerException.class,
-                () -> Subscription.builder(userContact, null, END, service)
+                () -> Subscription.builder(TEST_USER_CONTACT, null, END, TEST_SERVICE)
                         .build());
         assertEquals("startDate must not be null", ex.getMessage());
 
         ex = assertThrows(NullPointerException.class,
-                () -> Subscription.builder(userContact, START, null, service)
+                () -> Subscription.builder(TEST_USER_CONTACT, START, null, TEST_SERVICE)
                         .build());
         assertEquals("endDate must not be null", ex.getMessage());
     }
@@ -76,7 +76,7 @@ class SubscriptionTest {
         LocalDateTime end = START.minusDays(1);
 
         Exception ex = assertThrows(IllegalStateException.class,
-                () -> Subscription.builder(userContact, START, end, service)
+                () -> Subscription.builder(TEST_USER_CONTACT, START, end, TEST_SERVICE)
                         .build());
         assertEquals("startDate is after endDate", ex.getMessage());
     }
@@ -84,7 +84,7 @@ class SubscriptionTest {
     @Test
     void givenOptionalRenewalDaysShouldNotThrow() {
 
-        assertDoesNotThrow(() -> Subscription.builder(userContact, START, END, service)
+        assertDoesNotThrow(() -> Subscription.builder(TEST_USER_CONTACT, START, END, TEST_SERVICE)
                 .renewIn(null)
                 .build());
     }
@@ -93,7 +93,7 @@ class SubscriptionTest {
     void givenZeroRenewalDaysShouldThrow() {
 
         Exception ex = assertThrows(IllegalArgumentException.class,
-                () -> Subscription.builder(userContact, START, END, service)
+                () -> Subscription.builder(TEST_USER_CONTACT, START, END, TEST_SERVICE)
                         .renewIn(Duration.ofDays(0))
                         .build());
         assertEquals("your subscription cannot expire in less than one day", ex.getMessage());
@@ -103,7 +103,7 @@ class SubscriptionTest {
         LocalDateTime start = LocalDateTime.of(2024, 1, 1, 0, 0);
         LocalDateTime end = LocalDateTime.of(2024, 2, 1, 0, 0);
 
-        return Subscription.builder(userContact, start, end, petclinic)
+        return Subscription.builder(TEST_USER_CONTACT, start, end, petclinic)
                 .build();
     }
 
@@ -113,7 +113,7 @@ class SubscriptionTest {
         LocalDateTime end = LocalDateTime.of(2024, 6, 1, 0, 0);
 
         return Subscription
-                .builder(userContact, start, end, petclinic)
+                .builder(TEST_USER_CONTACT, start, end, petclinic)
                 .subscribe(petclinicLabs)
                 .build();
     }
@@ -131,7 +131,7 @@ class SubscriptionTest {
         Subscription sub2 = secondSubscription(petclinicV2, petclinicLabsV1);
 
         Subscription currentSubscription = Subscription
-                .builder(userContact, START, END, petclinicV2)
+                .builder(TEST_USER_CONTACT, START, END, petclinicV2)
                 .addSnapshot(sub1)
                 .addSnapshot(sub2)
                 .build();
@@ -148,6 +148,60 @@ class SubscriptionTest {
         assertAll(
                 () -> assertEquals(2, currentSubscription.getHistory().size()),
                 () -> assertEquals(history, currentSubscription.getHistory()));
+
+    }
+
+    @Test
+    void givenSubscriptionWithUsageLevelsShouldCreate() {
+
+        String usageLimitName = "maxAlfa";
+        UsageLevel ul1 = UsageLevel.nonRenewable(usageLimitName, 5);
+
+        Subscription sub = Subscription
+                .builder(TEST_USER_CONTACT, START, END, TEST_SERVICE)
+                .addUsageLevel(TEST_SERVICE.getName(), ul1)
+                .build();
+
+        assertEquals(ul1, sub.getUsageLevels().get(TEST_SERVICE.getName()).get(usageLimitName));
+
+    }
+
+    @Test
+    void givenSubscriptionToAServiceRelatedUsageLevelShoudBeEmpty() {
+
+        Subscription sub = Subscription
+                .builder(TEST_USER_CONTACT, START, END, TEST_SERVICE)
+                .build();
+
+        assertAll(() -> assertTrue(sub.getUsageLevels().containsKey(TEST_SERVICE.getName())),
+                () -> assertTrue(sub.getUsageLevels().get(TEST_SERVICE.getName()).isEmpty()));
+    }
+
+    @Test
+    void givenDuplicateUsageLevelShouldNotRegisterTwice() {
+        String usageLimitName = "maxAlfa";
+        UsageLevel ul1 = UsageLevel.nonRenewable(usageLimitName, 5);
+
+        Subscription sub = Subscription
+                .builder(TEST_USER_CONTACT, START, END, TEST_SERVICE)
+                .addUsageLevel(TEST_SERVICE.getName(), ul1)
+                .addUsageLevel(TEST_SERVICE.getName(), ul1)
+                .build();
+
+        assertEquals(1, sub.getUsageLevels().get(TEST_SERVICE.getName()).size());
+    }
+
+    @Test
+    void givenNonExistentServiceShouldThrowWhenAddingUsageLevel() {
+
+        UsageLevel ul1 = UsageLevel.nonRenewable("maxAlfa", 5);
+
+        Exception ex = assertThrows(IllegalStateException.class, () -> Subscription
+                .builder(TEST_USER_CONTACT, START, END, TEST_SERVICE)
+                .addUsageLevel("nonExistent", ul1)
+                .build());
+
+        assertEquals("Service 'nonExistent' doesn't exist. Register it previously", ex.getMessage());
 
     }
 

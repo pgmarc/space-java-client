@@ -6,19 +6,13 @@ import java.util.Optional;
 
 public final class UsageLevel {
 
-    private final String serviceName;
     private final String name;
     private final double consumed;
     private LocalDateTime resetTimestamp;
 
-    private UsageLevel(String serviceName, String name, double consumed) {
-        this.serviceName = serviceName;
+    private UsageLevel(String name, double consumed) {
         this.name = name;
         this.consumed = consumed;
-    }
-
-    public String getServiceName() {
-        return serviceName;
     }
 
     public String getName() {
@@ -41,22 +35,21 @@ public final class UsageLevel {
         return consumed;
     }
 
-    private static void validateUsageLevel(String serviceName, String name, double consumed) {
-        Objects.requireNonNull(serviceName, "service name must not be null");
+    private static void validateUsageLevel(String name, double consumed) {
         Objects.requireNonNull(name, "usage limit name must not be null");
         if (consumed <= 0) {
             throw new IllegalArgumentException("consumption must be greater than 0");
         }
     }
 
-    public static UsageLevel nonRenewable(String serviceName, String name, double consumed) {
-        validateUsageLevel(serviceName, name, consumed);
-        return new UsageLevel(serviceName, name, consumed);
+    public static UsageLevel nonRenewable(String name, double consumed) {
+        validateUsageLevel(name, consumed);
+        return new UsageLevel(name, consumed);
     }
 
-    public static UsageLevel renewable(String serviceName, String name, double consumed, LocalDateTime resetTimestamp) {
-        validateUsageLevel(serviceName, name, consumed);
-        UsageLevel level = new UsageLevel(serviceName, name, consumed);
+    public static UsageLevel renewable(String name, double consumed, LocalDateTime resetTimestamp) {
+        validateUsageLevel(name, consumed);
+        UsageLevel level = new UsageLevel(name, consumed);
         level.setResetTimestamp(resetTimestamp);
         return level;
     }
