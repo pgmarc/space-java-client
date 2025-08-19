@@ -15,13 +15,11 @@ class UsageLevelTest {
     @Test
     void givenNonRenewableUsageLimitShouldCreate() {
 
-        String serviceName = "petclinic";
         String usageLimitName = "maxPets";
         double consumption = 5;
-        UsageLevel usageLevel = UsageLevel.nonRenewable(serviceName, usageLimitName, consumption);
+        UsageLevel usageLevel = UsageLevel.nonRenewable(usageLimitName, consumption);
 
         assertAll(
-                () -> assertEquals(serviceName, usageLevel.getServiceName()),
                 () -> assertEquals(usageLimitName, usageLevel.getName()),
                 () -> assertEquals(consumption, usageLevel.getConsumption()),
                 () -> assertFalse(usageLevel.isRenewableUsageLimit()));
@@ -30,27 +28,23 @@ class UsageLevelTest {
     @Test
     void givenInvalidParamertersShouldThrow() {
 
-        String serviceName = "petclinic";
         String usageLimitName = "maxPets";
         double consumption = 5;
 
         assertAll(
-                () -> assertThrows(NullPointerException.class, () -> UsageLevel.nonRenewable(null, usageLimitName, consumption)),
-                () -> assertThrows(NullPointerException.class, () -> UsageLevel.nonRenewable(serviceName, null, consumption)),
-                () -> assertThrows(IllegalArgumentException.class, () -> UsageLevel.nonRenewable(serviceName, usageLimitName, -1)));
+                () -> assertThrows(NullPointerException.class, () -> UsageLevel.nonRenewable(null, consumption)),
+                () -> assertThrows(IllegalArgumentException.class, () -> UsageLevel.nonRenewable(usageLimitName, -1)));
     }
 
     @Test
     void givenRenewableUsageLimitShouldCreate() {
 
-        String serviceName = "Petclinic AI";
         String usageLimitName = "maxTokens";
         double consumption = 300;
         LocalDateTime resetTimestamp = LocalDateTime.of(2025, 8, 19, 0, 0);
-        UsageLevel usageLevel = UsageLevel.renewable(serviceName, usageLimitName, consumption, resetTimestamp);
+        UsageLevel usageLevel = UsageLevel.renewable(usageLimitName, consumption, resetTimestamp);
 
         assertAll(
-                () -> assertEquals(serviceName, usageLevel.getServiceName()),
                 () -> assertEquals(usageLimitName, usageLevel.getName()),
                 () -> assertEquals(consumption, usageLevel.getConsumption()),
                 () -> assertEquals(resetTimestamp, usageLevel.getResetTimestamp().get()),

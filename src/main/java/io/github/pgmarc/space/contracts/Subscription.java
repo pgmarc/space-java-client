@@ -19,6 +19,7 @@ public final class Subscription {
     private final LocalDateTime endDate;
     private final Duration renewalDays;
     private final List<SubscriptionSnapshot> history;
+    private final Map<String, Map<String, UsageLevel>> usageLevels;
 
     private Subscription(Builder builder) {
         this.userContact = builder.userContact;
@@ -27,6 +28,7 @@ public final class Subscription {
         this.renewalDays = builder.renewalDays;
         this.services = Collections.unmodifiableMap(builder.services);
         this.history = Collections.unmodifiableList(builder.history);
+        this.usageLevels = Collections.unmodifiableMap(builder.usageLevels);
     }
 
     public static Builder builder(UserContact userContact, LocalDateTime startDate, LocalDateTime endDate,
@@ -78,6 +80,10 @@ public final class Subscription {
         return history;
     }
 
+    public Map<String, Map<String, UsageLevel>> getUsageLevels() {
+        return usageLevels;
+    }
+
     public static final class Builder {
 
         private final LocalDateTime startDate;
@@ -85,6 +91,7 @@ public final class Subscription {
         private final UserContact userContact;
         private final Map<String, Service> services = new HashMap<>();
         private final List<SubscriptionSnapshot> history = new ArrayList<>();
+        private final Map<String, Map<String, UsageLevel>> usageLevels = new HashMap<>();
         private Duration renewalDays;
 
         private Builder(UserContact userContact, LocalDateTime startDate, LocalDateTime endDate) {
@@ -102,6 +109,9 @@ public final class Subscription {
         }
 
         public Builder subscribe(Service service) {
+            if (!services.containsKey(service.getName())) {
+                this.usageLevels.put(service.getName(), new HashMap<>());
+            }
             this.services.put(service.getName(), Objects.requireNonNull(service, "service must not be null"));
             return this;
         }
@@ -109,6 +119,18 @@ public final class Subscription {
         Builder addSnapshot(Subscription subscription) {
             Objects.requireNonNull(subscription, "subscription must not be null");
             this.history.add(SubscriptionSnapshot.of(subscription));
+            return this;
+        }
+
+        Builder addUsageLevel(String serviceName, UsageLevel usageLevel) {
+            if (!services.containsKey(serviceName)) {
+                throw new IllegalStateException("Service '" + serviceName + "' doesn't exist. Register it previously");
+            }
+
+            if (!usageLevels.get(serviceName).containsKey(usageLevel.getName())) {
+                this.usageLevels.get(serviceName).put(usageLevel.getName(), usageLevel);
+            }
+
             return this;
         }
 
