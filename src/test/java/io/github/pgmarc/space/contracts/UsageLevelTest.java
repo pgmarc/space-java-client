@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import org.junit.jupiter.api.Test;
 
@@ -41,13 +41,13 @@ class UsageLevelTest {
 
         String usageLimitName = "maxTokens";
         double consumption = 300;
-        LocalDateTime resetTimestamp = LocalDateTime.of(2025, 8, 19, 0, 0);
+        ZonedDateTime resetTimestamp = ZonedDateTime.parse("2025-08-19T00:00:00Z");
         UsageLevel usageLevel = UsageLevel.of(usageLimitName, consumption, resetTimestamp);
 
         assertAll(
                 () -> assertEquals(usageLimitName, usageLevel.getName()),
                 () -> assertEquals(consumption, usageLevel.getConsumption()),
-                () -> assertEquals(resetTimestamp, usageLevel.getResetTimestamp().get()),
+                () -> assertEquals(resetTimestamp.toLocalDateTime(), usageLevel.getResetTimestamp().get()),
                 () -> assertTrue(usageLevel.isRenewableUsageLimit()));
     }
 

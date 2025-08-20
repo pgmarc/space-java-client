@@ -4,21 +4,14 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.json.JSONStringer;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 class SubscriptionTest {
@@ -31,8 +24,8 @@ class SubscriptionTest {
 
     @BeforeEach
     void setUp() {
-        LocalDateTime start = LocalDateTime.of(2025, 8, 15, 0, 0);
-        LocalDateTime end = start.plusDays(30);
+        ZonedDateTime start = ZonedDateTime.parse("2025-08-15T00:00:00Z");
+        ZonedDateTime end = start.plusDays(30);
         billingPeriod = BillingPeriod.of(start, end);
         billingPeriod.setRenewalDays(Duration.ofDays(30));
     }

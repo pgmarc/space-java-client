@@ -6,16 +6,15 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
 class BillingPeriodTest {
 
-    private final LocalDateTime start = LocalDateTime.of(2025, 8, 15, 0, 0);
-    private final LocalDateTime end = start.plusDays(30);
+    private final ZonedDateTime start = ZonedDateTime.parse("2025-08-15T00:00:00Z");
+    private final ZonedDateTime end = start.plusDays(30);
 
     @Test
     void givenZeroRenewalDaysShouldThrow() {
@@ -42,7 +41,7 @@ class BillingPeriodTest {
 
         assertAll(
                 () -> assertTrue(billingPeriod.isAutoRenewable()),
-                () -> assertEquals(end.plusDays(30), billingPeriod.getRenewalDate().get()));
+                () -> assertEquals(end.plusDays(30).toLocalDateTime(), billingPeriod.getRenewalDate().get()));
     }
 
     @Test
@@ -50,8 +49,8 @@ class BillingPeriodTest {
 
         String startUtc = "2024-08-20T12:00Z";
         String endUtc = "2025-08-20T12:00Z";
-        LocalDateTime start = OffsetDateTime.parse(startUtc).toLocalDateTime();
-        LocalDateTime end = OffsetDateTime.parse(endUtc).toLocalDateTime();
+        ZonedDateTime start = ZonedDateTime.parse(startUtc);
+        ZonedDateTime end = ZonedDateTime.parse(endUtc);
         BillingPeriod expected = BillingPeriod.of(start, end);
         expected.setRenewalDays(Duration.ofDays(30));
 

@@ -1,6 +1,7 @@
 package io.github.pgmarc.space.contracts;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -8,14 +9,14 @@ public final class UsageLevel {
 
     private final String name;
     private final double consumed;
-    private LocalDateTime resetTimestamp;
+    private ZonedDateTime resetTimestamp;
 
     private UsageLevel(String name, double consumed) {
         this.name = name;
         this.consumed = consumed;
     }
 
-    private UsageLevel(String name, double consumed, LocalDateTime resetTimestamp) {
+    private UsageLevel(String name, double consumed, ZonedDateTime resetTimestamp) {
         this.name = name;
         this.consumed = consumed;
         this.resetTimestamp = resetTimestamp;
@@ -26,7 +27,7 @@ public final class UsageLevel {
     }
 
     public Optional<LocalDateTime> getResetTimestamp() {
-        return Optional.ofNullable(resetTimestamp);
+        return resetTimestamp != null ? Optional.of(resetTimestamp.toLocalDateTime()) : Optional.empty();
     }
 
     public boolean isRenewableUsageLimit() {
@@ -49,7 +50,7 @@ public final class UsageLevel {
         return new UsageLevel(name, consumed);
     }
 
-    static UsageLevel of(String name, double consumed, LocalDateTime resetTimestamp) {
+    static UsageLevel of(String name, double consumed, ZonedDateTime resetTimestamp) {
         validateUsageLevel(name, consumed);
         UsageLevel level = new UsageLevel(name, consumed, resetTimestamp);
         return level;

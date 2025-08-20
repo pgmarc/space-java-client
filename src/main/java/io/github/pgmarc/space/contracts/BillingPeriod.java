@@ -2,7 +2,7 @@ package io.github.pgmarc.space.contracts;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -10,25 +10,25 @@ import org.json.JSONObject;
 
 final class BillingPeriod {
 
-    private final LocalDateTime startDate;
-    private final LocalDateTime endDate;
+    private final ZonedDateTime startDate;
+    private final ZonedDateTime endDate;
     private Duration renewalDays;
 
-    private BillingPeriod(LocalDateTime startDate, LocalDateTime enDateTime) {
+    private BillingPeriod(ZonedDateTime startDate, ZonedDateTime endDate) {
         this.startDate = startDate;
-        this.endDate = enDateTime;
+        this.endDate = endDate;
     }
 
     LocalDateTime getStartDate() {
-        return startDate;
+        return startDate.toLocalDateTime();
     }
 
     LocalDateTime getEndDate() {
-        return endDate;
+        return endDate.toLocalDateTime();
     }
 
     boolean isExpired(LocalDateTime dateTime) {
-        return dateTime.isAfter(endDate);
+        return endDate.isAfter(startDate);
     }
 
     boolean isAutoRenewable() {
@@ -36,7 +36,7 @@ final class BillingPeriod {
     }
 
     Optional<LocalDateTime> getRenewalDate() {
-        return Optional.ofNullable(isAutoRenewable() ? endDate.plus(renewalDays) : null);
+        return Optional.ofNullable(isAutoRenewable() ? endDate.plus(renewalDays).toLocalDateTime() : null);
     }
 
     void setRenewalDays(Duration renewalDays) {
@@ -46,7 +46,7 @@ final class BillingPeriod {
         this.renewalDays = renewalDays;
     }
 
-    static BillingPeriod of(LocalDateTime startDate, LocalDateTime endDate) {
+    static BillingPeriod of(ZonedDateTime startDate, ZonedDateTime endDate) {
         Objects.requireNonNull(startDate, "startDate must not be null");
         Objects.requireNonNull(endDate, "endDate must not be null");
         if (startDate.isAfter(endDate)) {
@@ -76,9 +76,9 @@ final class BillingPeriod {
 
     static BillingPeriod fromJson(JSONObject json) {
         Objects.requireNonNull(json, "billing period json must not be null");
-        OffsetDateTime startUtc = OffsetDateTime.parse(json.getString(Keys.START_DATE.toString()));
-        OffsetDateTime endUtc = OffsetDateTime.parse(json.getString(Keys.END_DATE.toString()));
-        BillingPeriod billingPeriod = BillingPeriod.of(startUtc.toLocalDateTime(), endUtc.toLocalDateTime());
+        ZonedDateTime start = ZonedDateTime.parse(json.getString(Keys.START_DATE.toString()));
+        ZonedDateTime end = ZonedDateTime.parse(json.getString(Keys.END_DATE.toString()));
+        BillingPeriod billingPeriod = BillingPeriod.of(start, end);
         billingPeriod.setRenewalDays(Duration.ofDays(json.optLong(Keys.RENEWAL_DAYS.toString())));
 
         return billingPeriod;
