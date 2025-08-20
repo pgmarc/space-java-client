@@ -15,16 +15,18 @@ public final class UsageLevel {
         this.consumed = consumed;
     }
 
+    private UsageLevel(String name, double consumed, LocalDateTime resetTimestamp) {
+        this.name = name;
+        this.consumed = consumed;
+        this.resetTimestamp = resetTimestamp;
+    }
+
     public String getName() {
         return name;
     }
 
     public Optional<LocalDateTime> getResetTimestamp() {
         return Optional.ofNullable(resetTimestamp);
-    }
-
-    private void setResetTimestamp(LocalDateTime resetTimestamp) {
-        this.resetTimestamp = resetTimestamp;
     }
 
     public boolean isRenewableUsageLimit() {
@@ -42,15 +44,14 @@ public final class UsageLevel {
         }
     }
 
-    public static UsageLevel nonRenewable(String name, double consumed) {
+    static UsageLevel of(String name, double consumed) {
         validateUsageLevel(name, consumed);
         return new UsageLevel(name, consumed);
     }
 
-    public static UsageLevel renewable(String name, double consumed, LocalDateTime resetTimestamp) {
+    static UsageLevel of(String name, double consumed, LocalDateTime resetTimestamp) {
         validateUsageLevel(name, consumed);
-        UsageLevel level = new UsageLevel(name, consumed);
-        level.setResetTimestamp(resetTimestamp);
+        UsageLevel level = new UsageLevel(name, consumed, resetTimestamp);
         return level;
     }
 }

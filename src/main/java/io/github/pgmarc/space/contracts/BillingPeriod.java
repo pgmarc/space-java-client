@@ -3,13 +3,12 @@ package io.github.pgmarc.space.contracts;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.Objects;
 import java.util.Optional;
 
 import org.json.JSONObject;
 
-public final class BillingPeriod {
+final class BillingPeriod {
 
     private final LocalDateTime startDate;
     private final LocalDateTime endDate;
@@ -20,23 +19,23 @@ public final class BillingPeriod {
         this.endDate = enDateTime;
     }
 
-    public LocalDateTime getStartDate() {
+    LocalDateTime getStartDate() {
         return startDate;
     }
 
-    public LocalDateTime getEndDate() {
+    LocalDateTime getEndDate() {
         return endDate;
     }
 
-    public boolean isExpired(LocalDateTime dateTime) {
+    boolean isExpired(LocalDateTime dateTime) {
         return dateTime.isAfter(endDate);
     }
 
-    public boolean isAutoRenewable() {
+    boolean isAutoRenewable() {
         return renewalDays != null;
     }
 
-    public Optional<LocalDateTime> getRenewalDate() {
+    Optional<LocalDateTime> getRenewalDate() {
         return Optional.ofNullable(isAutoRenewable() ? endDate.plus(renewalDays) : null);
     }
 
@@ -124,9 +123,6 @@ public final class BillingPeriod {
 
     @Override
     public String toString() {
-        return "From " + startDate + " to " + endDate + ", renews in " + renewalDays;  
+        return "From " + startDate + " to " + endDate + ", renews in " + renewalDays;
     }
-
-    
-
 }
