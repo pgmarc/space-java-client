@@ -139,9 +139,9 @@ public final class Subscription {
             JSONObject rawServiceUsageLevels = usageLevel.getJSONObject(serviceName);
             for (String usageLimitName : rawServiceUsageLevels.keySet()) {
                 JSONObject rawUsageLevel = rawServiceUsageLevels.getJSONObject(usageLimitName);
-                LocalDateTime expirationDate = null;
+                ZonedDateTime expirationDate = null;
                 if (rawUsageLevel.has("resetTimestamp")) {
-                    expirationDate = ZonedDateTime.parse(rawUsageLevel.getString("resetTimestamp")).toLocalDateTime();
+                    expirationDate = ZonedDateTime.parse(rawUsageLevel.getString("resetTimestamp"));
                 }
                 UsageLevel ul = UsageLevel.of(serviceName, rawUsageLevel.getDouble("consumed"), expirationDate);
                 serviceLevels.put(usageLimitName, ul);
