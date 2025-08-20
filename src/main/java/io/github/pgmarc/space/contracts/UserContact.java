@@ -159,17 +159,26 @@ public final class UserContact implements Jsonable {
         }
     }
 
+    static UserContact fromJson(JSONObject json) {
+        Objects.requireNonNull(json, "user contact json must not be null");
+        return UserContact.builder(json.getString(JsonKeys.USER_ID.toString()),
+                json.getString(JsonKeys.USERNAME.toString()))
+                .firstName(json.optString(JsonKeys.FIRST_NAME.toString()))
+                .lastName(json.optString(JsonKeys.LAST_NAME.toString()))
+                .email(json.optString(JsonKeys.EMAIL.toString()))
+                .phone(json.optString(JsonKeys.PHONE.toString()))
+                .build();
+    }
+
     @Override
     public JSONObject toJson() {
-        JSONObject obj = new JSONObject()
+        return new JSONObject()
                 .put(JsonKeys.USER_ID.toString(), userId)
                 .put(JsonKeys.USERNAME.toString(), username)
                 .putOpt(JsonKeys.FIRST_NAME.toString(), firstName)
                 .putOpt(JsonKeys.LAST_NAME.toString(), lastName)
                 .putOpt(JsonKeys.EMAIL.toString(), email)
                 .putOpt(JsonKeys.PHONE.toString(), phone);
-
-        return obj;
     }
 
 }
