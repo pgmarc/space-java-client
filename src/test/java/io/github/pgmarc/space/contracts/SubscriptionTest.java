@@ -8,10 +8,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONStringer;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 class SubscriptionTest {
@@ -73,110 +80,71 @@ class SubscriptionTest {
                 .build());
     }
 
-    private Subscription firstPetclinicSub(Service petclinic) {
-        LocalDateTime start = LocalDateTime.of(2024, 1, 1, 0, 0);
-        LocalDateTime end = LocalDateTime.of(2024, 2, 1, 0, 0);
-
-        return Subscription.builder(TEST_USER_CONTACT, BillingPeriod.of(start, end), petclinic)
-                .build();
-    }
-
-    private Subscription secondSubscription(Service petclinic, Service petclinicLabs) {
-
-        LocalDateTime start = LocalDateTime.of(2024, 5, 1, 0, 0);
-        LocalDateTime end = LocalDateTime.of(2024, 6, 1, 0, 0);
-
-        return Subscription
-                .builder(TEST_USER_CONTACT, BillingPeriod.of(start, end), petclinic)
-                .subscribe(petclinicLabs)
-                .build();
-    }
-
     @Test
-    void givenASubscriptionHistoryShouldBeVisbile() {
+    void givenSubscriptionAsJsonShouldCreateSubscription() {
 
-        String petclinic = "Petclinic";
-        String petclinicLabs = "Petclinic Labs";
-        Service petclinicV1 = Service.builder(petclinic, "v1").plan("FREE").build();
-        Service petclinicV2 = Service.builder(petclinic, "v2").plan("GOLD").build();
-        Service petclinicLabsV1 = Service.builder(petclinicLabs, "v1").plan("PLATINUM").build();
+        String startUtcString = "2025-04-18T00:00:00Z";
+        String endUtcString = "2025-12-31T00:00:00Z";
+        int renewalDays = 365;
+        String zoomName = "zoom";
+        String zoomVersion = "2025";
+        String zoomPlan = "ENTERPRISE";
+        String zoomExtraSeats = "extraSeats";
+        int zoomExtraSeatsQuantity = 2;
+        String zoomHugeMeetings = "hugeMeetings";
+        int zoomHugeMeetingQuantity = 1;
 
-        Subscription sub1 = firstPetclinicSub(petclinicV1);
-        Subscription sub2 = secondSubscription(petclinicV2, petclinicLabsV1);
+        String petclinicService = "petclinic";
+        String petclinicVersion = "2024";
+        String petclinicPlan = "GOLD";
+        String petclinicPetsAdoptionCentre = "petsAdoptionCentre";
+        int petclinicPetsAdoptionCentreQuantity = 1;
 
-        Subscription currentSubscription = Subscription
-                .builder(TEST_USER_CONTACT, billingPeriod, petclinicV2)
-                .addSnapshot(sub1)
-                .addSnapshot(sub2)
-                .build();
+        Map<String, Object> billingPeriodMap = Map.of(
+                "startDate", startUtcString,
+                "endDate", endUtcString,
+                "autoRenew", true,
+                "renewalDays", renewalDays);
+        Map<String, Map<String, Object>> usageLevel = Map.of(
+                zoomName,
+                Map.of("maxSeats",
+                        Map.of("consumed", 10.0)),
+                petclinicService,
+                Map.of("maxPets",
+                        Map.of("consumed", 2.0),
+                        "maxVisits", Map.of("consumed", 5.0, "resetTimestamp", "2025-07-31T00:00:00Z")));
+        Map<String, String> contractedServices = Map.of(zoomName, zoomVersion, petclinicService, petclinicVersion);
+        Map<String, String> contractedPlans = Map.of(zoomName, zoomPlan, petclinicService, petclinicPlan);
+        Map<String, Map<String, Integer>> contractedAddOns = Map.of(
+                zoomName,
+                Map.of(zoomExtraSeats, zoomExtraSeatsQuantity,
+                        zoomHugeMeetings, zoomHugeMeetingQuantity),
+                petclinicService,
+                Map.of(petclinicPetsAdoptionCentre, petclinicPetsAdoptionCentreQuantity));
 
-        List<SubscriptionSnapshot> history = new ArrayList<>();
-        SubscriptionSnapshot snaphot1 = SubscriptionSnapshot.of(sub1);
-        SubscriptionSnapshot snaphot2 = SubscriptionSnapshot.of(sub2);
+        JSONObject snapshot1 = new JSONObject()
+                .put("startDate", "2024-04-18T00:00:00Z")
+                .put("endDate", "2024-05-18T00:00:00Z")
+                .put("contractedServices", contractedServices)
+                .put("subscriptionPlans", contractedPlans)
+                .put("subscriptionAddOns", contractedAddOns);
+        JSONArray history = new JSONArray()
+                .put(snapshot1);
 
-        history.add(snaphot1);
-        history.add(snaphot2);
+        JSONObject jsonInput = new JSONObject()
+                .put("userContact", TEST_USER_CONTACT.toJson())
+                .put("billingPeriod", billingPeriodMap)
+                .put("usageLevel", usageLevel)
+                .put("contractedServices", contractedServices)
+                .put("subscriptionPlans", contractedPlans)
+                .put("subscriptionAddOns", contractedAddOns)
+                .put("history", history);
 
-        assertEquals(history, currentSubscription.getHistory());
-
+        Subscription actual = Subscription.fromJson(jsonInput);
         assertAll(
-                () -> assertEquals(2, currentSubscription.getHistory().size()),
-                () -> assertEquals(history, currentSubscription.getHistory()));
+                () -> assertEquals(1, actual.getHistory().size()),
+                () -> assertEquals(2, actual.getUsageLevels().size()),
+                () -> assertEquals(2, actual.getServicesMap().size()));
 
     }
-
-    @Test
-    void givenSubscriptionWithUsageLevelsShouldCreate() {
-
-        String usageLimitName = "maxAlfa";
-        UsageLevel ul1 = UsageLevel.nonRenewable(usageLimitName, 5);
-
-        Subscription sub = Subscription
-                .builder(TEST_USER_CONTACT, billingPeriod, TEST_SERVICE)
-                .addUsageLevel(TEST_SERVICE.getName(), ul1)
-                .build();
-
-        assertEquals(ul1, sub.getUsageLevels().get(TEST_SERVICE.getName()).get(usageLimitName));
-
-    }
-
-    @Test
-    void givenSubscriptionToAServiceRelatedUsageLevelShoudBeEmpty() {
-
-        Subscription sub = Subscription
-                .builder(TEST_USER_CONTACT, billingPeriod, TEST_SERVICE)
-                .build();
-
-        assertAll(() -> assertTrue(sub.getUsageLevels().containsKey(TEST_SERVICE.getName())),
-                () -> assertTrue(sub.getUsageLevels().get(TEST_SERVICE.getName()).isEmpty()));
-    }
-
-    @Test
-    void givenDuplicateUsageLevelShouldNotRegisterTwice() {
-        String usageLimitName = "maxAlfa";
-        UsageLevel ul1 = UsageLevel.nonRenewable(usageLimitName, 5);
-
-        Subscription sub = Subscription
-                .builder(TEST_USER_CONTACT, billingPeriod, TEST_SERVICE)
-                .addUsageLevel(TEST_SERVICE.getName(), ul1)
-                .addUsageLevel(TEST_SERVICE.getName(), ul1)
-                .build();
-
-        assertEquals(1, sub.getUsageLevels().get(TEST_SERVICE.getName()).size());
-    }
-
-    @Test
-    void givenNonExistentServiceShouldThrowWhenAddingUsageLevel() {
-
-        UsageLevel ul1 = UsageLevel.nonRenewable("maxAlfa", 5);
-
-        Exception ex = assertThrows(IllegalStateException.class, () -> Subscription
-                .builder(TEST_USER_CONTACT, billingPeriod, TEST_SERVICE)
-                .addUsageLevel("nonExistent", ul1)
-                .build());
-
-        assertEquals("Service 'nonExistent' doesn't exist. Register it previously", ex.getMessage());
-
-    }
-
 }

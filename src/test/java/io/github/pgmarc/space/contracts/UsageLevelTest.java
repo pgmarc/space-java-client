@@ -17,7 +17,7 @@ class UsageLevelTest {
 
         String usageLimitName = "maxPets";
         double consumption = 5;
-        UsageLevel usageLevel = UsageLevel.nonRenewable(usageLimitName, consumption);
+        UsageLevel usageLevel = UsageLevel.of(usageLimitName, consumption);
 
         assertAll(
                 () -> assertEquals(usageLimitName, usageLevel.getName()),
@@ -32,8 +32,8 @@ class UsageLevelTest {
         double consumption = 5;
 
         assertAll(
-                () -> assertThrows(NullPointerException.class, () -> UsageLevel.nonRenewable(null, consumption)),
-                () -> assertThrows(IllegalArgumentException.class, () -> UsageLevel.nonRenewable(usageLimitName, -1)));
+                () -> assertThrows(NullPointerException.class, () -> UsageLevel.of(null, consumption)),
+                () -> assertThrows(IllegalArgumentException.class, () -> UsageLevel.of(usageLimitName, -1)));
     }
 
     @Test
@@ -42,7 +42,7 @@ class UsageLevelTest {
         String usageLimitName = "maxTokens";
         double consumption = 300;
         LocalDateTime resetTimestamp = LocalDateTime.of(2025, 8, 19, 0, 0);
-        UsageLevel usageLevel = UsageLevel.renewable(usageLimitName, consumption, resetTimestamp);
+        UsageLevel usageLevel = UsageLevel.of(usageLimitName, consumption, resetTimestamp);
 
         assertAll(
                 () -> assertEquals(usageLimitName, usageLevel.getName()),
