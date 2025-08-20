@@ -136,6 +136,20 @@ class UserContactTest {
     }
 
     @Test
+    void givenMinimunUserContactOptionalsShouldNotBeParsed() {
+
+        JSONObject input = new JSONObject()
+                .put("userId", TEST_USER_ID)
+                .put("username", TEST_USERNAME);
+
+        UserContact actual = UserContact.fromJson(input);
+        assertAll(() -> assertTrue(actual.getFirstName().isEmpty()),
+                () -> assertTrue(actual.getLastName().isEmpty()),
+                () -> assertTrue(actual.getEmail().isEmpty()),
+                () -> assertTrue(actual.getPhone().isEmpty()));
+    }
+
+    @Test
     void givenNullJsonShouldThrow() {
 
         Exception ex = assertThrows(NullPointerException.class, () -> UserContact.fromJson(null));

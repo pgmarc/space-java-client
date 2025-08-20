@@ -163,10 +163,10 @@ public final class UserContact implements Jsonable {
         Objects.requireNonNull(json, "user contact json must not be null");
         return UserContact.builder(json.getString(JsonKeys.USER_ID.toString()),
                 json.getString(JsonKeys.USERNAME.toString()))
-                .firstName(json.optString(JsonKeys.FIRST_NAME.toString()))
-                .lastName(json.optString(JsonKeys.LAST_NAME.toString()))
-                .email(json.optString(JsonKeys.EMAIL.toString()))
-                .phone(json.optString(JsonKeys.PHONE.toString()))
+                .firstName(json.optString(JsonKeys.FIRST_NAME.toString(), null))
+                .lastName(json.optString(JsonKeys.LAST_NAME.toString(), null))
+                .email(json.optString(JsonKeys.EMAIL.toString(), null))
+                .phone(json.optString(JsonKeys.PHONE.toString(), null))
                 .build();
     }
 
