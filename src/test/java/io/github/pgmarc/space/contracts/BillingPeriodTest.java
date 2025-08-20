@@ -7,7 +7,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
+import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
 class BillingPeriodTest {
@@ -35,11 +37,34 @@ class BillingPeriodTest {
     @Test
     void givenRenewableDateShouldBeRenowable() {
 
-        BillingPeriod billingPeriod = BillingPeriod.of(start,end);
+        BillingPeriod billingPeriod = BillingPeriod.of(start, end);
         billingPeriod.setRenewalDays(Duration.ofDays(30));
 
         assertAll(
                 () -> assertTrue(billingPeriod.isAutoRenewable()),
                 () -> assertEquals(end.plusDays(30), billingPeriod.getRenewalDate().get()));
+    }
+
+    @Test
+    void givenJsonShouldCreateBillingPeriod() {
+
+        String startUtc = "2024-08-20T12:00Z";
+        String endUtc = "2025-08-20T12:00Z";
+        LocalDateTime start = OffsetDateTime.parse(startUtc).toLocalDateTime();
+        LocalDateTime end = OffsetDateTime.parse(endUtc).toLocalDateTime();
+        BillingPeriod expected = BillingPeriod.of(start, end);
+        expected.setRenewalDays(Duration.ofDays(30));
+
+        JSONObject input = new JSONObject().put("startDate", startUtc)
+        .put("endDate", endUtc).put("autoRenew", true).put("renewalDays", 30L);
+
+        assertEquals(expected, BillingPeriod.fromJson(input));
+    }
+
+    @Test
+    void giveNullJsonShouldThrow() {
+
+        Exception ex = assertThrows(NullPointerException.class, () -> BillingPeriod.fromJson(null));
+        assertEquals("billing period json must not be null", ex.getMessage());
     }
 }
