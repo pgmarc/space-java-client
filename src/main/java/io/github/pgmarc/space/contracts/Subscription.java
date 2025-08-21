@@ -2,8 +2,6 @@ package io.github.pgmarc.space.contracts;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -14,9 +12,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 public final class Subscription {
 
@@ -88,7 +83,7 @@ public final class Subscription {
         return usageLevels;
     }
 
-    private enum Keys {
+    public enum Keys {
         USER_CONTACT("userContact"),
         BILLING_PERIOD("billingPeriod"),
         CONTRACTED_SERVICES("contractedServices"),
@@ -107,60 +102,6 @@ public final class Subscription {
         public String toString() {
             return name;
         }
-    }
-
-    static Map<String, Service> servicesFromJson(JSONObject json) {
-        JSONObject contractedServices = json.getJSONObject(Keys.CONTRACTED_SERVICES.toString());
-        JSONObject subscriptionPlans = json.getJSONObject(Keys.SUBSCRIPTION_PLANS.toString());
-        JSONObject subscriptionAddOns = json.getJSONObject(Keys.SUBSCRIPTION_ADDONS.toString());
-        Map<String, Service> services = new HashMap<>();
-
-        for (String serviceName : contractedServices.keySet()) {
-            Service.Builder serviceBuilder = Service.builder(serviceName, contractedServices.getString(serviceName))
-                    .plan(subscriptionPlans.getString(serviceName));
-
-            for (String addOnName : subscriptionAddOns.getJSONObject(serviceName).keySet()) {
-                serviceBuilder.addOn(addOnName, subscriptionAddOns.getJSONObject(serviceName).getLong(addOnName));
-            }
-            services.put(serviceName, serviceBuilder.build());
-        }
-        return services;
-    }
-
-    private static Map<String, Map<String, UsageLevel>> usageLevelsFromJson(JSONObject usageLevel) {
-        Objects.requireNonNull(usageLevel, "usage level must not be null");
-
-        Map<String, Map<String, UsageLevel>> usageLevelMap = new HashMap<>();
-        if (usageLevel.isEmpty()) {
-            return Collections.unmodifiableMap(usageLevelMap);
-        }
-        for (String serviceName : usageLevel.keySet()) {
-            Map<String, UsageLevel> serviceLevels = new HashMap<>();
-            JSONObject rawServiceUsageLevels = usageLevel.getJSONObject(serviceName);
-            for (String usageLimitName : rawServiceUsageLevels.keySet()) {
-                JSONObject rawUsageLevel = rawServiceUsageLevels.getJSONObject(usageLimitName);
-                ZonedDateTime expirationDate = null;
-                if (rawUsageLevel.has("resetTimestamp")) {
-                    expirationDate = ZonedDateTime.parse(rawUsageLevel.getString("resetTimestamp"));
-                }
-                UsageLevel ul = UsageLevel.of(serviceName, rawUsageLevel.getDouble("consumed"), expirationDate);
-                serviceLevels.put(usageLimitName, ul);
-            }
-            usageLevelMap.put(serviceName, Collections.unmodifiableMap(serviceLevels));
-        }
-        return usageLevelMap;
-    }
-
-    static Subscription fromJson(JSONObject json) {
-
-        BillingPeriod billingPeriod = BillingPeriod.fromJson(json.getJSONObject(Keys.BILLING_PERIOD.toString()));
-        UserContact userContact = UserContact.fromJson(json.getJSONObject(Keys.USER_CONTACT.toString()));
-        Map<String, Map<String, UsageLevel>> usageLevels = usageLevelsFromJson(
-                json.getJSONObject(Keys.USAGE_LEVEL.toString()));
-        Map<String, Service> services = servicesFromJson(json);
-        List<Snapshot> history = Snapshot.fromJson(json.optJSONArray(Keys.HISTORY.toString()));
-        return Subscription.builder(userContact, billingPeriod, services.values())
-                .addUsageLevels(usageLevels).addSnapshots(history).build();
     }
 
     public static final class Builder {
@@ -197,13 +138,13 @@ public final class Subscription {
             return this;
         }
 
-        private Builder addSnapshots(Collection<Snapshot> snaphsots) {
+        public Builder addSnapshots(Collection<Snapshot> snaphsots) {
             Objects.requireNonNull(snaphsots, "snapshots must not be null");
             this.history.addAll(snaphsots);
             return this;
         }
 
-        private Builder addUsageLevels(Map<String, Map<String, UsageLevel>> usageLevels) {
+        public Builder addUsageLevels(Map<String, Map<String, UsageLevel>> usageLevels) {
             this.usageLevels.putAll(usageLevels);
             return this;
         }
@@ -221,7 +162,7 @@ public final class Subscription {
         private final LocalDateTime enDateTime;
         private final Map<String, Service> services;
 
-        private Snapshot(LocalDateTime startDateTime, LocalDateTime endDateTime,
+        public Snapshot(LocalDateTime startDateTime, LocalDateTime endDateTime,
                 Map<String, Service> services) {
             this.starDateTime = startDateTime;
             this.enDateTime = endDateTime;
@@ -290,18 +231,6 @@ public final class Subscription {
             } else if (!services.equals(other.services))
                 return false;
             return true;
-        }
-
-        private static List<Snapshot> fromJson(JSONArray rawHistory) {
-            List<Snapshot> history = new ArrayList<>();
-            for (int i = 0; i < rawHistory.length(); i++) {
-                JSONObject snaphsot = rawHistory.getJSONObject(i);
-                OffsetDateTime startUtc = OffsetDateTime.parse(snaphsot.getString("startDate"));
-                OffsetDateTime end = OffsetDateTime.parse(snaphsot.getString("endDate"));
-                history.add(new Snapshot(startUtc.toLocalDateTime(), end.toLocalDateTime(),
-                        Subscription.servicesFromJson(snaphsot)));
-            }
-            return history;
         }
 
     }

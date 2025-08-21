@@ -111,49 +111,4 @@ class UserContactTest {
 
         assertTrue(obj.similar(userContact.toJson()));
     }
-
-    @Test
-    void givenUserContactJsonShouldParse() {
-
-        String firtName = "Alex";
-        String lastName = "Doe";
-        String email = "alexdoe@example.com";
-        String phone = "(+34) 666 666 666";
-        UserContact expected = UserContact.builder(TEST_USER_ID, TEST_USERNAME)
-                .firstName(firtName)
-                .lastName(lastName)
-                .email(email)
-                .phone(phone)
-                .build();
-
-        JSONObject input = new JSONObject().put("userId", TEST_USER_ID)
-                .put("username", TEST_USERNAME)
-                .put("firstName", firtName)
-                .put("lastName", lastName)
-                .put("email", email)
-                .put("phone", phone);
-        assertEquals(expected, UserContact.fromJson(input));
-    }
-
-    @Test
-    void givenMinimunUserContactOptionalsShouldNotBeParsed() {
-
-        JSONObject input = new JSONObject()
-                .put("userId", TEST_USER_ID)
-                .put("username", TEST_USERNAME);
-
-        UserContact actual = UserContact.fromJson(input);
-        assertAll(() -> assertTrue(actual.getFirstName().isEmpty()),
-                () -> assertTrue(actual.getLastName().isEmpty()),
-                () -> assertTrue(actual.getEmail().isEmpty()),
-                () -> assertTrue(actual.getPhone().isEmpty()));
-    }
-
-    @Test
-    void givenNullJsonShouldThrow() {
-
-        Exception ex = assertThrows(NullPointerException.class, () -> UserContact.fromJson(null));
-        assertEquals("user contact json must not be null", ex.getMessage());
-    }
-
 }

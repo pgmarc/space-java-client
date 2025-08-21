@@ -1,6 +1,6 @@
 package io.github.pgmarc.space.contracts;
 
-final class AddOn {
+public final class AddOn {
 
     private final String name;
     private final long quantity;

@@ -11,9 +11,20 @@ public final class UsageLevel {
     private final double consumed;
     private ZonedDateTime resetTimestamp;
 
-    private UsageLevel(String name, double consumed) {
-        this.name = name;
-        this.consumed = consumed;
+    public enum Keys {
+        CONSUMED("consumed"),
+        RESET_TIMESTAMP("resetTimestamp");
+
+        private final String name;
+
+        private Keys(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
     }
 
     private UsageLevel(String name, double consumed, ZonedDateTime resetTimestamp) {
@@ -45,12 +56,11 @@ public final class UsageLevel {
         }
     }
 
-    static UsageLevel of(String name, double consumed) {
-        validateUsageLevel(name, consumed);
-        return new UsageLevel(name, consumed);
+    public static UsageLevel of(String name, double consumed) {
+        return of(name, consumed, null);
     }
 
-    static UsageLevel of(String name, double consumed, ZonedDateTime resetTimestamp) {
+    public static UsageLevel of(String name, double consumed, ZonedDateTime resetTimestamp) {
         validateUsageLevel(name, consumed);
         UsageLevel level = new UsageLevel(name, consumed, resetTimestamp);
         return level;
