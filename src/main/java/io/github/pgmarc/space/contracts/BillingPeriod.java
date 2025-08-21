@@ -6,17 +6,16 @@ import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.json.JSONObject;
-
-final class BillingPeriod {
+public final class BillingPeriod {
 
     private final ZonedDateTime startDate;
     private final ZonedDateTime endDate;
     private Duration renewalDays;
 
-    private BillingPeriod(ZonedDateTime startDate, ZonedDateTime endDate) {
+    private BillingPeriod(ZonedDateTime startDate, ZonedDateTime endDate, Duration renewalDays) {
         this.startDate = startDate;
         this.endDate = endDate;
+        this.renewalDays = renewalDays;
     }
 
     LocalDateTime getStartDate() {
@@ -39,23 +38,32 @@ final class BillingPeriod {
         return Optional.ofNullable(isAutoRenewable() ? endDate.plus(renewalDays).toLocalDateTime() : null);
     }
 
-    void setRenewalDays(Duration renewalDays) {
-        if (renewalDays != null && renewalDays.toDays() <= 0) {
-            throw new IllegalArgumentException("your subscription cannot expire in less than one day");
-        }
+    public void setRenewalDays(Duration renewalDays) {
+        validateRenewalDays(renewalDays);
         this.renewalDays = renewalDays;
     }
 
-    static BillingPeriod of(ZonedDateTime startDate, ZonedDateTime endDate) {
+    private static void validateRenewalDays(Duration renewalDays) {
+        if (renewalDays != null && renewalDays.toDays() <= 0) {
+            throw new IllegalArgumentException("your subscription cannot expire in less than one day");
+        }
+    }
+
+    public static BillingPeriod of(ZonedDateTime startDate, ZonedDateTime endDate) {
+        return of(startDate, endDate, null);
+    }
+
+    public static BillingPeriod of(ZonedDateTime startDate, ZonedDateTime endDate, Duration renewalDays) {
         Objects.requireNonNull(startDate, "startDate must not be null");
         Objects.requireNonNull(endDate, "endDate must not be null");
         if (startDate.isAfter(endDate)) {
             throw new IllegalStateException("startDate is after endDate");
         }
-        return new BillingPeriod(startDate, endDate);
+        validateRenewalDays(renewalDays);
+        return new BillingPeriod(startDate, endDate, renewalDays);
     }
 
-    private enum Keys {
+    public enum Keys {
 
         START_DATE("startDate"),
         END_DATE("endDate"),
@@ -72,16 +80,6 @@ final class BillingPeriod {
         public String toString() {
             return name;
         }
-    }
-
-    static BillingPeriod fromJson(JSONObject json) {
-        Objects.requireNonNull(json, "billing period json must not be null");
-        ZonedDateTime start = ZonedDateTime.parse(json.getString(Keys.START_DATE.toString()));
-        ZonedDateTime end = ZonedDateTime.parse(json.getString(Keys.END_DATE.toString()));
-        BillingPeriod billingPeriod = BillingPeriod.of(start, end);
-        billingPeriod.setRenewalDays(Duration.ofDays(json.optLong(Keys.RENEWAL_DAYS.toString())));
-
-        return billingPeriod;
     }
 
     @Override

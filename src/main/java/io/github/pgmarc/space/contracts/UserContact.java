@@ -138,7 +138,7 @@ public final class UserContact implements Jsonable {
         }
     }
 
-    private enum JsonKeys {
+    public enum Keys {
 
         USER_ID("userId"),
         USERNAME("username"),
@@ -149,7 +149,7 @@ public final class UserContact implements Jsonable {
 
         private final String name;
 
-        private JsonKeys(String name) {
+        private Keys(String name) {
             this.name = name;
         }
 
@@ -159,26 +159,16 @@ public final class UserContact implements Jsonable {
         }
     }
 
-    static UserContact fromJson(JSONObject json) {
-        Objects.requireNonNull(json, "user contact json must not be null");
-        return UserContact.builder(json.getString(JsonKeys.USER_ID.toString()),
-                json.getString(JsonKeys.USERNAME.toString()))
-                .firstName(json.optString(JsonKeys.FIRST_NAME.toString(), null))
-                .lastName(json.optString(JsonKeys.LAST_NAME.toString(), null))
-                .email(json.optString(JsonKeys.EMAIL.toString(), null))
-                .phone(json.optString(JsonKeys.PHONE.toString(), null))
-                .build();
-    }
 
     @Override
     public JSONObject toJson() {
         return new JSONObject()
-                .put(JsonKeys.USER_ID.toString(), userId)
-                .put(JsonKeys.USERNAME.toString(), username)
-                .putOpt(JsonKeys.FIRST_NAME.toString(), firstName)
-                .putOpt(JsonKeys.LAST_NAME.toString(), lastName)
-                .putOpt(JsonKeys.EMAIL.toString(), email)
-                .putOpt(JsonKeys.PHONE.toString(), phone);
+                .put(Keys.USER_ID.toString(), userId)
+                .put(Keys.USERNAME.toString(), username)
+                .putOpt(Keys.FIRST_NAME.toString(), firstName)
+                .putOpt(Keys.LAST_NAME.toString(), lastName)
+                .putOpt(Keys.EMAIL.toString(), email)
+                .putOpt(Keys.PHONE.toString(), phone);
     }
 
 }

@@ -44,26 +44,4 @@ class BillingPeriodTest {
                 () -> assertEquals(end.plusDays(30).toLocalDateTime(), billingPeriod.getRenewalDate().get()));
     }
 
-    @Test
-    void givenJsonShouldCreateBillingPeriod() {
-
-        String startUtc = "2024-08-20T12:00Z";
-        String endUtc = "2025-08-20T12:00Z";
-        ZonedDateTime start = ZonedDateTime.parse(startUtc);
-        ZonedDateTime end = ZonedDateTime.parse(endUtc);
-        BillingPeriod expected = BillingPeriod.of(start, end);
-        expected.setRenewalDays(Duration.ofDays(30));
-
-        JSONObject input = new JSONObject().put("startDate", startUtc)
-        .put("endDate", endUtc).put("autoRenew", true).put("renewalDays", 30L);
-
-        assertEquals(expected, BillingPeriod.fromJson(input));
-    }
-
-    @Test
-    void giveNullJsonShouldThrow() {
-
-        Exception ex = assertThrows(NullPointerException.class, () -> BillingPeriod.fromJson(null));
-        assertEquals("billing period json must not be null", ex.getMessage());
-    }
 }
