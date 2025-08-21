@@ -6,7 +6,7 @@ import org.json.JSONObject;
 
 import io.github.pgmarc.space.contracts.UserContact;
 
-final class UserDeserializer implements JsonDeserializable<UserContact> {
+final class UserContactDeserializer implements JsonDeserializable<UserContact> {
 
     @Override
     public UserContact fromJson(JSONObject json) {

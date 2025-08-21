@@ -12,7 +12,7 @@ import io.github.pgmarc.space.contracts.UserContact;
 
 class UserContactSerializerTest {
 
-    private final UserDeserializer deserializer = new UserDeserializer();
+    private final UserContactDeserializer deserializer = new UserContactDeserializer();
 
     @Test
     void givenUserContactJsonShouldParse() {
