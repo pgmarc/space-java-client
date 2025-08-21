@@ -1,4 +1,4 @@
-package io.github.pgmarc.space.serializers;
+package io.github.pgmarc.space.deserializers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;

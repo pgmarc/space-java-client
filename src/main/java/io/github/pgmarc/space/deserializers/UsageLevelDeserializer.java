@@ -1,4 +1,4 @@
-package io.github.pgmarc.space.serializers;
+package io.github.pgmarc.space.deserializers;
 
 import java.time.ZonedDateTime;
 import java.util.Collections;
