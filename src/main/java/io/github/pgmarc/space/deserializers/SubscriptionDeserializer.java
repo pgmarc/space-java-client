@@ -15,10 +15,10 @@ import io.github.pgmarc.space.contracts.Subscription.Snapshot;
 public final class SubscriptionDeserializer implements JsonDeserializable<Subscription> {
 
     private final BillingPeriodDeserializer billingSerializer = new BillingPeriodDeserializer();
-    private final UserDeserializer userContactDeserializer = new UserDeserializer();
+    private final UserContactDeserializer userContactDeserializer = new UserContactDeserializer();
     private final UsageLevelDeserializer usageLevelDeserializer = new UsageLevelDeserializer();
     private final ServicesDeserializer servicesDeserializer = new ServicesDeserializer();
-    private final HistoryDeserializer historyDeserializer = new HistoryDeserializer(servicesDeserializer);
+    private final SnapshotsDeserializer historyDeserializer = new SnapshotsDeserializer(servicesDeserializer);
 
     @Override
     public Subscription fromJson(JSONObject json) {

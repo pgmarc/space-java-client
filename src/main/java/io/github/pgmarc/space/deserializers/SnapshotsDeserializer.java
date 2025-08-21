@@ -11,11 +11,11 @@ import io.github.pgmarc.space.contracts.BillingPeriod;
 import io.github.pgmarc.space.contracts.Subscription;
 import io.github.pgmarc.space.contracts.Subscription.Snapshot;
 
-class HistoryDeserializer implements JsonDeserializable<List<Snapshot>> {
+class SnapshotsDeserializer implements JsonDeserializable<List<Snapshot>> {
 
     private final ServicesDeserializer servicesDeserializer;
 
-    HistoryDeserializer(ServicesDeserializer servicesDeserializer) {
+    SnapshotsDeserializer(ServicesDeserializer servicesDeserializer) {
         this.servicesDeserializer = servicesDeserializer;
     }
 

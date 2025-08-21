@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 
-import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
 class BillingPeriodTest {
