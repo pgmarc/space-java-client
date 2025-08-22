@@ -12,30 +12,30 @@ import io.github.pgmarc.space.contracts.UsageLevel;
 
 final class UsageLevelDeserializer implements JsonDeserializable<Map<String, Map<String, UsageLevel>>> {
 
+    private Map<String, UsageLevel> getServiceUsageLevels(JSONObject usageLevels) {
+        Map<String, UsageLevel> res = new HashMap<>();
+        for (String usageLimitName : usageLevels.keySet()) {
+            JSONObject rawUsageLevel = usageLevels.getJSONObject(usageLimitName);
+            ZonedDateTime resetTimestamp = null;
+            if (rawUsageLevel.has(UsageLevel.Keys.RESET_TIMESTAMP.toString())) {
+                resetTimestamp = ZonedDateTime
+                        .parse(rawUsageLevel.getString(UsageLevel.Keys.RESET_TIMESTAMP.toString()));
+            }
+            UsageLevel ul = UsageLevel.of(usageLimitName, rawUsageLevel.getDouble(UsageLevel.Keys.CONSUMED.toString()),
+                    resetTimestamp);
+            res.put(usageLimitName, ul);
+        }
+        return Collections.unmodifiableMap(res);
+
+    }
+
     @Override
     public Map<String, Map<String, UsageLevel>> fromJson(JSONObject usageLevel) {
         Objects.requireNonNull(usageLevel, "usage level must not be null");
-
-        Map<String, Map<String, UsageLevel>> usageLevelMap = new HashMap<>();
-        if (usageLevel.isEmpty()) {
-            return usageLevelMap;
-        }
+        Map<String, Map<String, UsageLevel>> res = new HashMap<>();
         for (String serviceName : usageLevel.keySet()) {
-            Map<String, UsageLevel> serviceLevels = new HashMap<>();
-            JSONObject rawServiceUsageLevels = usageLevel.getJSONObject(serviceName);
-            for (String usageLimitName : rawServiceUsageLevels.keySet()) {
-                JSONObject rawUsageLevel = rawServiceUsageLevels.getJSONObject(usageLimitName);
-                ZonedDateTime expirationDate = null;
-                if (rawUsageLevel.has(UsageLevel.Keys.RESET_TIMESTAMP.toString())) {
-                    expirationDate = ZonedDateTime
-                            .parse(rawUsageLevel.getString(UsageLevel.Keys.RESET_TIMESTAMP.toString()));
-                }
-                UsageLevel ul = UsageLevel.of(serviceName, rawUsageLevel.getDouble(UsageLevel.Keys.CONSUMED.toString()),
-                        expirationDate);
-                serviceLevels.put(usageLimitName, ul);
-            }
-            usageLevelMap.put(serviceName, Collections.unmodifiableMap(serviceLevels));
+            res.put(serviceName, getServiceUsageLevels(usageLevel.getJSONObject(serviceName)));
         }
-        return usageLevelMap;
+        return Collections.unmodifiableMap(res);
     }
 }
