@@ -37,8 +37,8 @@ class BillingPeriodTest {
         BillingPeriod billingPeriod = BillingPeriod.of(start, end);
         billingPeriod.setRenewalDays(Duration.ofDays(days));
 
-        assertThat(billingPeriod.getDuration().toDays()).isNotNull().isEqualTo(days);
-        assertThat(billingPeriod.getRenewalDate().get()).isEqualTo(end.plusDays(30).toLocalDateTime());
+        assertThat(billingPeriod.getDuration().toDays()).isEqualTo(days);
+        assertThat(billingPeriod.getRenewalDate()).isPresent().hasValue(end.plusDays(30).toLocalDateTime());
     }
 
 }
