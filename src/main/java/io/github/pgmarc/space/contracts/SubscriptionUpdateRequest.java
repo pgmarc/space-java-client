@@ -14,7 +14,7 @@ public class SubscriptionUpdateRequest {
     }
 
     public Set<Service> getServices() {
-        return services;
+        return Set.copyOf(services);
     }
 
     public static SubscriptionUpdateRequest builder() {
