@@ -23,6 +23,7 @@ public final class ContractsEndpoint {
 
     private static final MediaType JSON = MediaType.get("application/json");
     private static final String ENDPOINT = "contracts";
+    private static final String STATUS_CODE = "statusCode";
 
     private final OkHttpClient client;
     private final HttpUrl baseUrl;
@@ -51,7 +52,7 @@ public final class ContractsEndpoint {
             ResponseBody responseBody = response.body();
             JSONObject jsonResponse = new JSONObject(responseBody.string());
             if (!response.isSuccessful()) {
-                jsonResponse.put("statusCode", response.code());
+                jsonResponse.put(STATUS_CODE, response.code());
                 throw new SpaceApiException(errorDeserializer.fromJson(jsonResponse));
             }
 
@@ -69,7 +70,7 @@ public final class ContractsEndpoint {
         try (Response response = client.newCall(request).execute()) {
             JSONObject jsonResponse = new JSONObject(response.body().string());
             if (!response.isSuccessful()) {
-                jsonResponse.put("statusCode", response.code());
+                jsonResponse.put(STATUS_CODE, response.code());
                 throw new SpaceApiException(errorDeserializer.fromJson(jsonResponse));
             }
             res = subscriptionDeserializer.fromJson(jsonResponse);
@@ -90,7 +91,7 @@ public final class ContractsEndpoint {
             ResponseBody responseBody = response.body();
             JSONObject jsonResponse = new JSONObject(responseBody.string());
             if (!response.isSuccessful()) {
-                jsonResponse.put("statusCode", response.code());
+                jsonResponse.put(STATUS_CODE, response.code());
                 throw new SpaceApiException(errorDeserializer.fromJson(jsonResponse));
             }
             res = subscriptionDeserializer.fromJson(jsonResponse);
