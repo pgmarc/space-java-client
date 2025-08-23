@@ -1,5 +1,6 @@
 package io.github.pgmarc.space.contracts;
 
+import java.io.IOException;
 import java.time.Duration;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -23,7 +24,6 @@ class ContractsEndpointTest {
     private final OkHttpClient httpClient = new OkHttpClient.Builder().build();
     private static HttpUrl url;
     private final ContractsEndpoint endpoint = new ContractsEndpoint(httpClient, url, TEST_API_KEY);
-
 
     @RegisterExtension
     static WireMockExtension wm = WireMockExtension.newInstance()
@@ -75,11 +75,17 @@ class ContractsEndpointTest {
                 .build();
 
         assertThatNoException().isThrownBy(() -> endpoint.addContract(subReq));
-        Subscription subscription = endpoint.addContract(subReq);
-        assertThat(subscription.getServices()).isEqualTo(subReq.getServices());
-        assertThat(subscription.getUserId()).isEqualTo(userId);
-        assertThat(subscription.getRenewalDuration().get()).isEqualTo(Duration.ofDays(45));
-        assertThat(subscription.getHistory()).isEmpty();
+        Subscription subscription;
+        try {
+            subscription = endpoint.addContract(subReq);
+            assertThat(subscription.getServices()).isEqualTo(subReq.getServices());
+            assertThat(subscription.getUserId()).isEqualTo(userId);
+            assertThat(subscription.getRenewalDuration().get()).isEqualTo(Duration.ofDays(45));
+            assertThat(subscription.getHistory()).isEmpty();
+        } catch (IOException e) {
+            fail();
+        }
+
     }
 
     @Test
@@ -122,8 +128,13 @@ class ContractsEndpointTest {
                                 .withHeader("Content-Type", "application/json")
                                 .withBodyFile("getContractById-response.json")));
 
-        Subscription subscription = endpoint.getContractByUserId(userId);
-        assertThat(subscription.getUserId()).isEqualTo(userId);
+        Subscription subscription;
+        try {
+            subscription = endpoint.getContractByUserId(userId);
+            assertThat(subscription.getUserId()).isEqualTo(userId);
+        } catch (IOException e) {
+            fail();
+        }
 
     }
 
@@ -171,9 +182,13 @@ class ContractsEndpointTest {
                 .service("petclinic", "v1")
                 .plan("GOLD")
                 .add();
-        Subscription sub = endpoint.updateContractByUserId(userId, subscription);
-
-        assertThat(sub.getUserId()).isEqualTo(userId);
+        Subscription sub;
+        try {
+            sub = endpoint.updateContractByUserId(userId, subscription);
+            assertThat(sub.getUserId()).isEqualTo(userId);
+        } catch (IOException e) {
+            fail();
+        }
 
     }
 
