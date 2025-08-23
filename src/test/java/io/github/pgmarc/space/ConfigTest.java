@@ -1,8 +1,7 @@
 package io.github.pgmarc.space;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.Duration;
 
@@ -18,16 +17,20 @@ class ConfigTest {
 
         Config config = Config.builder(TEST_HOST, TEST_API_KEY).build();
 
-        assertEquals("http://" + TEST_HOST + ":5403/api/v1", config.getUrl().toString());
-        assertEquals(TEST_API_KEY, config.getApiKey());
+        assertAll(
+                () -> assertThat(config.getUrl().toString()).isEqualTo("http://" + TEST_HOST + ":5403/api/v1"),
+                () -> assertThat(config.getApiKey()).isEqualTo(TEST_API_KEY));
+
     }
 
     @Test
     void givenNoHostAndPortShouldThrow() {
 
-        assertAll(
-                () -> assertThrows(NullPointerException.class, () -> Config.builder(null, TEST_API_KEY).build()),
-                () -> assertThrows(NullPointerException.class, () -> Config.builder(TEST_HOST, null).build()));
+        assertThatExceptionOfType(NullPointerException.class)
+                .isThrownBy(() -> Config.builder(null, TEST_API_KEY).build());
+        assertThatExceptionOfType(NullPointerException.class)
+                .isThrownBy(() -> Config.builder(TEST_HOST, null).build());
+
     }
 
     @Test
@@ -45,9 +48,12 @@ class ConfigTest {
                 .writeTimeout(Duration.ofMillis(writeTimeoutMillis))
                 .build();
 
-        assertEquals("http://" + TEST_HOST + ":" + port + "/" + prefixPath, config.getUrl().toString());
-        assertEquals(readTimeoutMillis, config.getReadTimeout().toMillis());
-        assertEquals(writeTimeoutMillis, config.getWriteTimeout().toMillis());
+        assertAll(
+                () -> assertThat(config.getUrl().toString())
+                        .isEqualTo("http://" + TEST_HOST + ":" + port + "/" + prefixPath),
+                () -> assertThat(config.getReadTimeout().toMillis()).isEqualTo(readTimeoutMillis),
+                () -> assertThat(config.getWriteTimeout().toMillis()).isEqualTo(writeTimeoutMillis));
+
     }
 
     @Test
@@ -56,8 +62,7 @@ class ConfigTest {
         Config config = Config.builder(TEST_HOST, TEST_API_KEY)
                 .prefixPath(null)
                 .build();
-
-        assertEquals("http://example.com:5403/api/v1", config.getUrl().toString());
+        assertThat(config.getUrl().toString()).isEqualTo("http://example.com:5403/api/v1");
     }
 
 }

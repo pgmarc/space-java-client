@@ -1,9 +1,6 @@
 package io.github.pgmarc.space.contracts;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.*;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -19,28 +16,29 @@ class BillingPeriodTest {
     void givenZeroRenewalDaysShouldThrow() {
 
         BillingPeriod period = BillingPeriod.of(start, end);
-        Exception ex = assertThrows(IllegalArgumentException.class,
-                () -> period.setRenewalDays(Duration.ofHours(12)));
-        assertEquals("your subscription cannot expire in less than one day", ex.getMessage());
+
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> period.setRenewalDays(Duration.ofHours(12)))
+                .withMessage("your subscription cannot expire in less than one day");
     }
 
     @Test
     void givenStartDateAfterEndDateShouldThrow() {
 
-        Exception ex = assertThrows(IllegalStateException.class,
-                () -> BillingPeriod.of(start, start.minusDays(1)));
-        assertEquals("startDate is after endDate", ex.getMessage());
+        assertThatExceptionOfType(IllegalStateException.class)
+                .isThrownBy(() -> BillingPeriod.of(start, start.minusDays(1)))
+                .withMessage("startDate is after endDate");
     }
 
     @Test
     void givenRenewableDateShouldBeRenowable() {
 
+        int days = 30;
         BillingPeriod billingPeriod = BillingPeriod.of(start, end);
-        billingPeriod.setRenewalDays(Duration.ofDays(30));
+        billingPeriod.setRenewalDays(Duration.ofDays(days));
 
-        assertAll(
-                () -> assertTrue(billingPeriod.isAutoRenewable()),
-                () -> assertEquals(end.plusDays(30).toLocalDateTime(), billingPeriod.getRenewalDate().get()));
+        assertThat(billingPeriod.getDuration().toDays()).isNotNull().isEqualTo(days);
+        assertThat(billingPeriod.getRenewalDate().get()).isEqualTo(end.plusDays(30).toLocalDateTime());
     }
 
 }
