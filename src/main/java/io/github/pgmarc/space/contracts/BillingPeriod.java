@@ -26,6 +26,10 @@ public final class BillingPeriod {
         return endDate.toLocalDateTime();
     }
 
+    Duration getDuration() {
+        return renewalDays;
+    }
+
     boolean isExpired(LocalDateTime dateTime) {
         return endDate.isAfter(startDate);
     }

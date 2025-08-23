@@ -1,0 +1,180 @@
+package io.github.pgmarc.space.contracts;
+
+import java.time.Duration;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+
+import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
+
+import io.github.pgmarc.space.exceptions.SpaceApiException;
+import okhttp3.HttpUrl;
+import okhttp3.OkHttpClient;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
+
+import static org.assertj.core.api.Assertions.*;
+
+class ContractsEndpointTest {
+
+    private static final String TEST_API_KEY = "prueba";
+    private final OkHttpClient httpClient = new OkHttpClient.Builder().build();
+    private static HttpUrl url;
+    private final ContractsEndpoint endpoint = new ContractsEndpoint(httpClient, url, TEST_API_KEY);
+
+
+    @RegisterExtension
+    static WireMockExtension wm = WireMockExtension.newInstance()
+            .options(wireMockConfig().dynamicPort().globalTemplating(true))
+            .build();
+
+    @BeforeAll
+    static void setUp() {
+        url = new HttpUrl.Builder().scheme("http").host("localhost").port(wm.getPort()).build();
+    }
+
+    @Test
+    void givenASubscriptionShouldBeCreated() {
+
+        String userId = "01c36d29-0d6a-4b41-83e9-8c6d9310c508";
+
+        wm.stubFor(post(urlEqualTo("/contracts"))
+                .withHeader("x-api-key", equalTo(TEST_API_KEY))
+                .withHeader("Content-Type", equalToIgnoreCase("application/json; charset=utf-8"))
+                .withHeader("Accept", equalTo("application/json"))
+                .withRequestBody(matchingJsonPath("$.userContact"))
+                .withRequestBody(matchingJsonPath("$.billingPeriod"))
+                .withRequestBody(matchingJsonPath("$.contractedServices"))
+                .withRequestBody(matchingJsonPath("$.subscriptionPlans"))
+                .withRequestBody(matchingJsonPath("$.subscriptionAddOns"))
+                .willReturn(
+                        created()
+                                .withHeader("Content-Type", "application/json")
+                                .withBodyFile("addContracts-response.hbs")));
+
+        UserContact userContact = UserContact.builder("01c36d29-0d6a-4b41-83e9-8c6d9310c508", "johndoe")
+                .firstName("John")
+                .lastName("Doe")
+                .email("john.doe@my-domain.com")
+                .phone("+34 666 666 666")
+                .build();
+
+        SubscriptionRequest subReq = SubscriptionRequest.builder(userContact)
+                .renewIn(Duration.ofDays(45))
+                .service("zoom", "2025")
+                .plan("ENTERPRISE")
+                .addOn("extraSeats", 2)
+                .addOn("hugeMeetings", 1)
+                .buildService()
+                .service("petclinic", "2024")
+                .plan("GOLD")
+                .addOn("petsAdoptionCentre", 1)
+                .buildService()
+                .build();
+
+        assertThatNoException().isThrownBy(() -> endpoint.addContract(subReq));
+        Subscription subscription = endpoint.addContract(subReq);
+        assertThat(subscription.getServices()).isEqualTo(subReq.getServices());
+        assertThat(subscription.getUserId()).isEqualTo(userId);
+        assertThat(subscription.getRenewalDuration().get()).isEqualTo(Duration.ofDays(45));
+        assertThat(subscription.getHistory()).isEmpty();
+    }
+
+    @Test
+    void givenRequestWithNoApiKeyShouldThrow() {
+
+        wm.stubFor(post(urlEqualTo("/contracts"))
+                .willReturn(
+                        unauthorized()
+                                .withHeader("Content-Type", "application/json")
+                                .withBody("{\r\n" + //
+                                        "  \"error\": \"API Key not found. Please ensure to add an API Key as value of the \\\"x-api-key\\\" header.\"\r\n"
+                                        + //
+                                        "}")));
+
+        UserContact userContact = UserContact.builder("error", "alex")
+                .build();
+
+        SubscriptionRequest subReq = SubscriptionRequest.builder(userContact)
+                .service("err", "v1")
+                .plan("Error")
+                .buildService()
+                .build();
+
+        assertThatExceptionOfType(SpaceApiException.class).isThrownBy(() -> endpoint.addContract(subReq))
+                .withMessageContaining("API Key not found");
+
+    }
+
+    @Test
+    void givenAnUserIdShouldReturnASubscription() {
+
+        String userId = "01c36d29-0d6a-4b41-83e9-8c6d9310c508";
+
+        wm.stubFor(get(urlPathTemplate("/contracts/{userId}"))
+                .withPathParam("userId", equalTo(userId))
+                .withHeader("x-api-key", equalTo(TEST_API_KEY))
+                .withHeader("Accept", equalTo("application/json"))
+                .willReturn(
+                        created()
+                                .withHeader("Content-Type", "application/json")
+                                .withBodyFile("getContractById-response.json")));
+
+        Subscription subscription = endpoint.getContractByUserId(userId);
+        assertThat(subscription.getUserId()).isEqualTo(userId);
+
+    }
+
+    @Test
+    void givenAnUserIdThatDoesNotExistShouldThrowError() {
+
+        String userId = "non-existent";
+
+        wm.stubFor(get(urlPathTemplate("/contracts/{userId}"))
+                .withPathParam("userId", equalTo(userId))
+                .withHeader("x-api-key", equalTo(TEST_API_KEY))
+                .withHeader("Accept", equalTo("application/json"))
+                .willReturn(
+                        aResponse()
+                                .withStatus(404)
+                                .withHeader("Content-Type", "application/json; charset=utf-8")
+                                .withBody("{\"error\":\"Contract with userId {{request.path.userId}} not found\"}")));
+
+        assertThatExceptionOfType(SpaceApiException.class)
+                .isThrownBy(() -> endpoint.getContractByUserId(userId))
+                .withMessage("Contract with userId " + userId + " not found")
+                .extracting(SpaceApiException::getCode).isEqualTo(404);
+
+    }
+
+    @Test
+    void givenAnUserIdAndServicesShouldUpdateSubscription() {
+
+        String userId = "01c36d29-0d6a-4b41-83e9-8c6d9310c508";
+
+        wm.stubFor(put(urlPathTemplate("/contracts/{userId}"))
+                .withPathParam("userId", equalTo(userId))
+                .withHeader("x-api-key", equalTo(TEST_API_KEY))
+                .withHeader("Accept", equalTo("application/json"))
+                .withHeader("Content-Type", equalToIgnoreCase("application/json; charset=utf-8"))
+                .withRequestBody(matchingJsonPath("$.contractedServices"))
+                .withRequestBody(matchingJsonPath("$.subscriptionPlans"))
+                .withRequestBody(matchingJsonPath("$.subscriptionAddOns"))
+                .willReturn(
+                        ok()
+                                .withHeader("Content-Type", "application/json")
+                                .withBodyFile("getContractById-response.json")));
+
+        SubscriptionUpdateRequest subscription = SubscriptionUpdateRequest.builder()
+                .service("petclinic", "v1")
+                .plan("GOLD")
+                .add();
+        Subscription sub = endpoint.updateContractByUserId(userId, subscription);
+
+        assertThat(sub.getUserId()).isEqualTo(userId);
+
+    }
+
+}
