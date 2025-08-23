@@ -47,8 +47,16 @@ public final class Subscription {
         return billingPeriod.getEndDate();
     }
 
+    public Optional<Duration> getRenewalDuration() {
+        return Optional.of(billingPeriod.getDuration());
+    }
+
     public boolean isAutoRenewable() {
         return billingPeriod.isAutoRenewable();
+    }
+
+    public boolean isExpired(LocalDateTime date) {
+        return billingPeriod.isExpired(date);
     }
 
     public Optional<LocalDateTime> getRenewalDate() {

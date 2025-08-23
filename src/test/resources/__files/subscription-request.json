@@ -1,6 +1,6 @@
 {
   "userContact": {
-    "userId": "01c36d29-0d6a-4b41-83e9-8c6d9310c508",
+    "userId": "{{jsonPath request.body '$.userContact.userId'}}",
     "username": "johndoe",
     "fistName": "John",
     "lastName": "Doe",
