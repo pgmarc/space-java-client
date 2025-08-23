@@ -2,6 +2,8 @@ package io.github.pgmarc.space.contracts;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.Optional;
@@ -31,7 +33,7 @@ public final class BillingPeriod {
     }
 
     boolean isExpired(LocalDateTime dateTime) {
-        return endDate.isAfter(startDate);
+        return endDate.isAfter(ZonedDateTime.of(dateTime, ZoneId.of("UTC")));
     }
 
     boolean isAutoRenewable() {
