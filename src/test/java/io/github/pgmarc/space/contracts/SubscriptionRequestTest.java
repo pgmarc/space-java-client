@@ -51,8 +51,8 @@ class SubscriptionRequestTest {
 
         Exception ex = assertThrows(IllegalStateException.class, () -> SubscriptionRequest
                 .builder(TEST_USER_CONTACT)
-                .service("test", "v1")
-                .service("incorrect", "v1")
+                .startService("test", "v1")
+                .startService("incorrect", "v1")
                 .build());
         assertEquals("you must build a service before creating another", ex.getMessage());
     }
@@ -82,7 +82,7 @@ class SubscriptionRequestTest {
 
         Exception ex = assertThrows(IllegalStateException.class, () -> SubscriptionRequest
                 .builder(TEST_USER_CONTACT)
-                .buildService()
+                .endService()
                 .build());
         assertEquals("you must call 'newService' before adding a service", ex.getMessage());
     }

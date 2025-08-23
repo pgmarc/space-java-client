@@ -63,15 +63,15 @@ class ContractsEndpointTest {
 
         SubscriptionRequest subReq = SubscriptionRequest.builder(userContact)
                 .renewIn(Duration.ofDays(45))
-                .service("zoom", "2025")
+                .startService("zoom", "2025")
                 .plan("ENTERPRISE")
                 .addOn("extraSeats", 2)
                 .addOn("hugeMeetings", 1)
-                .buildService()
-                .service("petclinic", "2024")
+                .endService()
+                .startService("petclinic", "2024")
                 .plan("GOLD")
                 .addOn("petsAdoptionCentre", 1)
-                .buildService()
+                .endService()
                 .build();
 
         assertThatNoException().isThrownBy(() -> endpoint.addContract(subReq));
@@ -104,9 +104,9 @@ class ContractsEndpointTest {
                 .build();
 
         SubscriptionRequest subReq = SubscriptionRequest.builder(userContact)
-                .service("err", "v1")
+                .startService("err", "v1")
                 .plan("Error")
-                .buildService()
+                .endService()
                 .build();
 
         assertThatExceptionOfType(SpaceApiException.class).isThrownBy(() -> endpoint.addContract(subReq))
