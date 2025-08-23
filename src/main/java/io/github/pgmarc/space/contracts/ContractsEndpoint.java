@@ -78,7 +78,8 @@ public final class ContractsEndpoint {
         return res;
     }
 
-    public Subscription updateContractByUserId(String userId, SubscriptionUpdateRequest subscription) throws IOException {
+    public Subscription updateContractByUserId(String userId, SubscriptionUpdateRequest subscription)
+            throws IOException {
         HttpUrl url = this.baseUrl.newBuilder().addPathSegment(ENDPOINT).addEncodedPathSegment(userId).build();
         Subscription res = null;
         Request request = new Request.Builder().url(url)
@@ -93,8 +94,6 @@ public final class ContractsEndpoint {
                 throw new SpaceApiException(errorDeserializer.fromJson(jsonResponse));
             }
             res = subscriptionDeserializer.fromJson(jsonResponse);
-        } catch (IOException e) {
-            e.printStackTrace();
         }
 
         return res;
