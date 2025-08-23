@@ -18,7 +18,7 @@ class ConfigTest {
         Config config = Config.builder(TEST_HOST, TEST_API_KEY).build();
 
         assertAll(
-                () -> assertThat(config.getUrl().toString()).isEqualTo("http://" + TEST_HOST + ":5403/api/v1"),
+                () -> assertThat(config.getUrl()).hasToString("http://" + TEST_HOST + ":5403/api/v1"),
                 () -> assertThat(config.getApiKey()).isEqualTo(TEST_API_KEY));
 
     }
@@ -53,8 +53,8 @@ class ConfigTest {
                 .build();
 
         assertAll(
-                () -> assertThat(config.getUrl().toString())
-                        .isEqualTo("http://" + TEST_HOST + ":" + port + "/" + prefixPath),
+                () -> assertThat(config.getUrl())
+                        .hasToString("http://" + TEST_HOST + ":" + port + "/" + prefixPath),
                 () -> assertThat(config.getReadTimeout().toMillis()).isEqualTo(readTimeoutMillis),
                 () -> assertThat(config.getWriteTimeout().toMillis()).isEqualTo(writeTimeoutMillis));
 
@@ -66,7 +66,7 @@ class ConfigTest {
         Config config = Config.builder(TEST_HOST, TEST_API_KEY)
                 .prefixPath(null)
                 .build();
-        assertThat(config.getUrl().toString()).isEqualTo("http://example.com:5403/api/v1");
+        assertThat(config.getUrl()).hasToString("http://example.com:5403/api/v1");
     }
 
 }

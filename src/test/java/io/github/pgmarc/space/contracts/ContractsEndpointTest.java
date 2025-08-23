@@ -80,7 +80,7 @@ class ContractsEndpointTest {
             subscription = endpoint.addContract(subReq);
             assertThat(subscription.getServices()).isEqualTo(subReq.getServices());
             assertThat(subscription.getUserId()).isEqualTo(userId);
-            assertThat(subscription.getRenewalDuration().get()).isEqualTo(Duration.ofDays(45));
+            assertThat(subscription.getRenewalDuration()).isPresent().hasValue(Duration.ofDays(45));
             assertThat(subscription.getHistory()).isEmpty();
         } catch (IOException e) {
             fail();
