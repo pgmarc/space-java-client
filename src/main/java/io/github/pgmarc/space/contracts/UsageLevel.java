@@ -62,7 +62,6 @@ public final class UsageLevel {
 
     public static UsageLevel of(String name, double consumed, ZonedDateTime resetTimestamp) {
         validateUsageLevel(name, consumed);
-        UsageLevel level = new UsageLevel(name, consumed, resetTimestamp);
-        return level;
+        return new UsageLevel(name, consumed, resetTimestamp);
     }
 }
