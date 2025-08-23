@@ -174,7 +174,7 @@ public final class Subscription {
                 Map<String, Service> services) {
             this.starDateTime = startDateTime;
             this.enDateTime = endDateTime;
-            this.services = Collections.unmodifiableMap(services);
+            this.services = new HashMap<>(services);
         }
 
         private Snapshot(Subscription subscription) {
@@ -192,7 +192,7 @@ public final class Subscription {
         }
 
         public Map<String, Service> getServices() {
-            return services;
+            return Collections.unmodifiableMap(services);
         }
 
         public Optional<Service> getService(String name) {
