@@ -29,15 +29,15 @@ class SubscriptionRequestSerializerTest {
         String petclinic = "petclinic";
         SubscriptionRequest subReq = SubscriptionRequest.builder(userContact)
                 .renewIn(Duration.ofDays(365))
-                .service(zoom, "2025")
+                .startService(zoom, "2025")
                 .plan("ENTERPRISE")
                 .addOn("extraSeats", 2)
                 .addOn("hugeMeetings", 1)
-                .buildService()
-                .service("petclinic", "2024")
+                .endService()
+                .startService("petclinic", "2024")
                 .plan("GOLD")
                 .addOn("petsAdoptionCentre", 1)
-                .buildService()
+                .endService()
                 .build();
 
         SubscriptionRequestSerializer serializer = new SubscriptionRequestSerializer();

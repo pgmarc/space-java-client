@@ -46,17 +46,23 @@ public final class SubscriptionRequest {
             this.userContact = userContact;
         }
 
-        private boolean isServiceBuilderAlive() {
-            return serviceBuilder != null;
+        public Builder subscribe(Service service) {
+            this.services.add(Objects.requireNonNull(service, "service must not be null"));
+            return this;
         }
 
-        private void validateServiceBuilderCalled(String message) {
-            if (!isServiceBuilderAlive()) {
-                throw new IllegalStateException(message);
-            }
+        public Builder subscribeAll(Collection<Service> services) {
+            Objects.requireNonNull(services, "services must not be null");
+            this.services.addAll(services);
+            return this;
         }
 
-        public Builder service(String name, String version) {
+        public Builder renewIn(Duration renewalDays) {
+            this.renewalDays = renewalDays;
+            return this;
+        }
+
+        public Builder startService(String name, String version) {
             if (isServiceBuilderAlive()) {
                 throw new IllegalStateException("you must build a service before creating another");
             }
@@ -76,36 +82,30 @@ public final class SubscriptionRequest {
             return this;
         }
 
-        private void destroyServiceBuilder() {
-            this.serviceBuilder = null;
-        }
-
-        public Builder buildService() {
+        public Builder endService() {
             validateServiceBuilderCalled("you must call 'newService' before adding a service");
             services.add(serviceBuilder.build());
             destroyServiceBuilder();
             return this;
         }
 
-        public Builder subscribe(Service service) {
-            this.services.add(Objects.requireNonNull(service, "service must not be null"));
-            return this;
-        }
-
-        public Builder subscribeAll(Collection<Service> services) {
-            Objects.requireNonNull(services, "services must not be null");
-            this.services.addAll(services);
-            return this;
-        }
-
-        public Builder renewIn(Duration renewalDays) {
-            this.renewalDays = renewalDays;
-            return this;
-        }
-
         public SubscriptionRequest build() {
             Objects.requireNonNull(userContact, "userContact must not be null");
             return new SubscriptionRequest(this);
+        }
+
+        private boolean isServiceBuilderAlive() {
+            return serviceBuilder != null;
+        }
+
+        private void validateServiceBuilderCalled(String message) {
+            if (!isServiceBuilderAlive()) {
+                throw new IllegalStateException(message);
+            }
+        }
+
+        private void destroyServiceBuilder() {
+            this.serviceBuilder = null;
         }
     }
 }
