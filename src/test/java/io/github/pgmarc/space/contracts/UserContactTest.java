@@ -1,7 +1,6 @@
 package io.github.pgmarc.space.contracts;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.*;
 
 import java.util.Optional;
 
@@ -19,31 +18,33 @@ class UserContactTest {
     void givenIdAndUsernameShouldCreateUserContact() {
 
         UserContact contact = UserContact.builder(TEST_USER_ID, TEST_USERNAME).build();
-        assertEquals(TEST_USER_ID, contact.getUserId());
-        assertEquals(TEST_USERNAME, contact.getUsername());
+        assertThat(contact.getUserId()).isEqualTo(TEST_USER_ID);
+        assertThat(contact.getUsername()).isEqualTo(TEST_USERNAME);
     }
 
     @Test
     void givenNullUserIdShouldThrow() {
 
-        Exception ex = assertThrows(NullPointerException.class,
-                () -> UserContact.builder(null, TEST_USERNAME));
-        assertEquals("userId must not be null", ex.getMessage());
+        assertThatExceptionOfType(NullPointerException.class)
+                .isThrownBy(() -> UserContact.builder(null, TEST_USERNAME))
+                .withMessage("userId must not be null");
     }
 
     @Test
     void givenNullUsernameShouldThrow() {
 
-        Exception ex = assertThrows(NullPointerException.class,
-                () -> UserContact.builder(TEST_USER_ID, null));
-        assertEquals("username must not be null", ex.getMessage());
+        assertThatExceptionOfType(NullPointerException.class)
+                .isThrownBy(() -> UserContact.builder(TEST_USER_ID, null))
+                .withMessage("username must not be null");
     }
 
     @ParameterizedTest
     @ValueSource(strings = { "", "ab", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" })
     void givenInvalidUsernamesShouldThrow(String username) {
 
-        assertThrows(IllegalArgumentException.class, () -> UserContact.builder(TEST_USER_ID, username).build());
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> UserContact.builder(TEST_USER_ID, username).build());
+
     }
 
     // Using pairwise testing
@@ -61,9 +62,9 @@ class UserContactTest {
                 .lastName(lastName)
                 .email(email)
                 .phone(phone).build();
-        assertEquals(Optional.ofNullable(firstName), contact.getFirstName());
-        assertEquals(Optional.ofNullable(lastName), contact.getLastName());
-        assertEquals(Optional.ofNullable(email), contact.getEmail());
-        assertEquals(Optional.ofNullable(phone), contact.getPhone());
+        assertThat(contact.getFirstName()).isEqualTo(Optional.ofNullable(firstName));
+        assertThat(contact.getLastName()).isEqualTo(Optional.ofNullable(lastName));
+        assertThat(contact.getEmail()).isEqualTo(Optional.ofNullable(email));
+        assertThat(contact.getPhone()).isEqualTo(Optional.ofNullable(phone));
     }
 }

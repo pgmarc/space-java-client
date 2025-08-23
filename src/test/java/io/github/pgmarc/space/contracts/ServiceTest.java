@@ -1,7 +1,6 @@
 package io.github.pgmarc.space.contracts;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
@@ -15,31 +14,33 @@ class ServiceTest {
         Service service = Service.builder("test", "alfa")
                 .plan(plan).build();
 
-        assertEquals("foo", service.getPlan().get());
+        assertThat(service.getPlan()).isPresent().hasValue(plan);
+
     }
 
     @Test
     void givenServiceWithNullPlanShouldThrow() {
-        Exception ex = assertThrows(NullPointerException.class,
-                () -> Service.builder("foo", "alfa").plan(null));
 
-        assertEquals("plan must not be null", ex.getMessage());
+        assertThatExceptionOfType(NullPointerException.class)
+                .isThrownBy(() -> Service.builder("foo", "alfa").plan(null))
+                .withMessage("plan must not be null");
+
     }
 
     @Test
     void givenServiceWithBlankPlanShouldThrow() {
-        Exception ex = assertThrows(IllegalArgumentException.class,
-                () -> Service.builder("foo", "alfa").plan(""));
 
-        assertEquals("plan must not be blank", ex.getMessage());
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> Service.builder("foo", "alfa").plan(""))
+                .withMessage("plan must not be blank");
     }
 
     @Test
     void givenNoPlanOrAddOnShouldThrow() {
 
-        Exception ex = assertThrows(IllegalStateException.class,
-                () -> Service.builder("test", "alfa").build());
-        assertEquals("At least you have to be subscribed to a plan or add-on", ex.getMessage());
+        assertThatExceptionOfType(IllegalStateException.class)
+                .isThrownBy(() -> Service.builder("test", "alfa").build())
+                .withMessage("At least you have to be subscribed to a plan or add-on");
     }
 
     @Test
@@ -50,24 +51,23 @@ class ServiceTest {
         Service service = Service.builder("test", "alfa")
                 .plan(plan).build();
 
-        assertEquals(plan, service.getPlan().get());
+        assertThat(service.getPlan()).isPresent().hasValue(plan);
     }
 
     @Test
     void givenNullAsAddOnKeyShouldThrow() {
-        Exception ex = assertThrows(NullPointerException.class,
-                () -> Service.builder("test", "alfa").addOn(null, 1));
 
-        assertEquals("add-on name must not be null", ex.getMessage());
+        assertThatExceptionOfType(NullPointerException.class)
+                .isThrownBy(() -> Service.builder("test", "alfa").addOn(null, 1))
+                .withMessage("add-on name must not be null");
     }
 
-    
     @Test
     void givenAddOnWithZeroQuantityShouldThrow() {
-        Exception ex = assertThrows(IllegalArgumentException.class,
-                () -> Service.builder("test", "alfa").addOn("zeroQuantity", 0));
 
-        assertEquals("zeroQuantity quantity must be greater than 0", ex.getMessage());
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> Service.builder("test", "alfa").addOn("zeroQuantity", 0))
+                .withMessage("zeroQuantity quantity must be greater than 0");
     }
 
     @Test
@@ -78,7 +78,8 @@ class ServiceTest {
         Service service = Service.builder("test", "alfa")
                 .addOn(addOn, 1).build();
 
-        assertEquals(addOn, service.getAddOn(addOn).get().getName());
+        assertThat(service.getAddOn(addOn)).isPresent().hasValue(new AddOn(addOn, 1));
+
     }
 
     @Test
@@ -92,9 +93,9 @@ class ServiceTest {
                 .addOn(addOn1.getName(), addOn1.getQuantity())
                 .addOn(addOn2.getName(), addOn1.getQuantity()).build();
 
-        assertEquals(plan, service.getPlan().get());
-        assertEquals(addOn1, service.getAddOn(addOn1.getName()).get());
-        assertEquals(addOn2, service.getAddOn(addOn2.getName()).get());
+        assertThat(service.getPlan()).isPresent().hasValue(plan);
+        assertThat(service.getAddOn(addOn1.getName())).isPresent().hasValue(addOn1);
+        assertThat(service.getAddOn(addOn2.getName())).isPresent().hasValue(addOn2);
     }
 
 }

@@ -1,12 +1,9 @@
 package io.github.pgmarc.space.contracts;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.*;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
-import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,65 +40,61 @@ class SubscriptionRequestTest {
                 .renewIn(Duration.ofDays(renewalDays))
                 .build();
 
-        assertEquals(Set.of(service1, service2), sub.getServices());
+        assertThat(sub.getServices()).contains(service1, service2);
     }
 
     @Test
     void givenConsecutiveServiceCreationShouldThrow() {
 
-        Exception ex = assertThrows(IllegalStateException.class, () -> SubscriptionRequest
+        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> SubscriptionRequest
                 .builder(TEST_USER_CONTACT)
                 .startService("test", "v1")
                 .startService("incorrect", "v1")
-                .build());
-        assertEquals("you must build a service before creating another", ex.getMessage());
+                .build()).withMessage("you must build a service before creating another");
     }
 
     @Test
     void givenPlanCallBeforeCallingCreationServiceShouldThrow() {
 
-        Exception ex = assertThrows(IllegalStateException.class, () -> SubscriptionRequest
+        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> SubscriptionRequest
                 .builder(TEST_USER_CONTACT)
                 .plan("foo")
-                .build());
-        assertEquals("you must call 'newService' before setting a plan: foo", ex.getMessage());
+                .build()).withMessage("you must call 'newService' before setting a plan: foo");
     }
 
     @Test
     void givenAddOnCallBeforeCallingCreationServiceShouldThrow() {
 
-        Exception ex = assertThrows(IllegalStateException.class, () -> SubscriptionRequest
+        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> SubscriptionRequest
                 .builder(TEST_USER_CONTACT)
                 .addOn("foo", 1)
-                .build());
-        assertEquals("you must call 'newService' before setting an add-on: foo", ex.getMessage());
+                .build()).withMessage("you must call 'newService' before setting an add-on: foo");
+
     }
 
     @Test
     void givenServiceBuildCallBeforeCreationServiceShouldThrow() {
 
-        Exception ex = assertThrows(IllegalStateException.class, () -> SubscriptionRequest
+        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> SubscriptionRequest
                 .builder(TEST_USER_CONTACT)
                 .endService()
-                .build());
-        assertEquals("you must call 'newService' before adding a service", ex.getMessage());
+                .build()).withMessage("you must call 'newService' before adding a service");
     }
 
     @Test
     void whenNoRequiredParametersInputShouldThrow() {
 
-        Exception ex = assertThrows(NullPointerException.class,
-                () -> SubscriptionRequest.builder(null)
-                        .build());
-        assertEquals("userContact must not be null", ex.getMessage());
+        assertThatExceptionOfType(NullPointerException.class).isThrownBy(() -> SubscriptionRequest.builder(null)
+                .build()).withMessage("userContact must not be null");
     }
 
     @Test
     void givenOptionalRenewalDaysShouldNotThrow() {
 
-        assertDoesNotThrow(() -> SubscriptionRequest.builder(TEST_USER_CONTACT)
+        assertThat(SubscriptionRequest.builder(TEST_USER_CONTACT)
                 .renewIn(null)
-                .build());
+                .build().getRenewalDays()).isNull();
+
     }
 
 }
