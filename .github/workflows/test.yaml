@@ -13,8 +13,3 @@ jobs:
         distribution: 'temurin'
     - name: Run tests
       run: mvn test
-    - name: Upload code coverage to Sonarcloud
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: mvn org.sonarsource.scanner.maven:sonar-maven-plugin:5.1.0.4751:sonar
-        -Dsonar.projectKey=pgmarc_space-java-client -Pcoverage
