@@ -3,7 +3,6 @@ package io.github.pgmarc.space.contracts;
 import java.io.IOException;
 import java.util.Objects;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import io.github.pgmarc.space.deserializers.ErrorDeserializer;
@@ -40,7 +39,7 @@ public final class ContractsEndpoint {
                 .add("x-api-key", apiKey).build();
     }
 
-    public Subscription addContract(SubscriptionRequest subscriptionReq) {
+    public Subscription addContract(SubscriptionRequest subscriptionReq) throws IOException {
         Objects.requireNonNull(subscriptionReq, "subscription request must not be null");
 
         HttpUrl url = this.baseUrl.newBuilder().addPathSegment(ENDPOINT).build();
@@ -48,8 +47,7 @@ public final class ContractsEndpoint {
         Request request = new Request.Builder().url(url)
                 .post(RequestBody.create(subscriptionRequestSerializer.toJson(subscriptionReq).toString(), JSON))
                 .headers(requiredHeaders).build();
-        try {
-            Response response = client.newCall(request).execute();
+        try (Response response = client.newCall(request).execute()) {
             ResponseBody responseBody = response.body();
             JSONObject jsonResponse = new JSONObject(responseBody.string());
             if (!response.isSuccessful()) {
@@ -58,42 +56,36 @@ public final class ContractsEndpoint {
             }
 
             res = subscriptionDeserializer.fromJson(jsonResponse);
-        } catch (IOException e) {
-            e.printStackTrace();
         }
 
         return res;
     }
 
-    public Subscription getContractByUserId(String userId) {
+    public Subscription getContractByUserId(String userId) throws IOException {
 
         HttpUrl url = this.baseUrl.newBuilder().addPathSegment(ENDPOINT).addEncodedPathSegment(userId).build();
         Subscription res = null;
         Request request = new Request.Builder().url(url).headers(requiredHeaders).build();
-        try {
-            Response response = client.newCall(request).execute();
+        try (Response response = client.newCall(request).execute()) {
             JSONObject jsonResponse = new JSONObject(response.body().string());
             if (!response.isSuccessful()) {
                 jsonResponse.put("statusCode", response.code());
                 throw new SpaceApiException(errorDeserializer.fromJson(jsonResponse));
             }
             res = subscriptionDeserializer.fromJson(jsonResponse);
-        } catch (IOException e) {
-            e.printStackTrace();
         }
 
         return res;
     }
 
-    public Subscription updateContractByUserId(String userId, SubscriptionUpdateRequest subscription) {
+    public Subscription updateContractByUserId(String userId, SubscriptionUpdateRequest subscription) throws IOException {
         HttpUrl url = this.baseUrl.newBuilder().addPathSegment(ENDPOINT).addEncodedPathSegment(userId).build();
         Subscription res = null;
         Request request = new Request.Builder().url(url)
                 .put(RequestBody.create(subscriptionUpdateRequestSerializer.toJson(subscription).toString(), JSON))
                 .headers(requiredHeaders)
                 .build();
-        try {
-            Response response = client.newCall(request).execute();
+        try (Response response = client.newCall(request).execute()) {
             ResponseBody responseBody = response.body();
             JSONObject jsonResponse = new JSONObject(responseBody.string());
             if (!response.isSuccessful()) {
