@@ -26,10 +26,14 @@ class ConfigTest {
     @Test
     void givenNoHostAndPortShouldThrow() {
 
+        Config.Builder config1 = Config.builder(null, TEST_API_KEY);
         assertThatExceptionOfType(NullPointerException.class)
-                .isThrownBy(() -> Config.builder(null, TEST_API_KEY).build());
+                .isThrownBy(() -> config1.build())
+                .withMessage("host must not be null");
+        Config.Builder config2 = Config.builder(TEST_HOST, null);
         assertThatExceptionOfType(NullPointerException.class)
-                .isThrownBy(() -> Config.builder(TEST_HOST, null).build());
+                .isThrownBy(() -> config2.build())
+                .withMessage("api key must not be null");
 
     }
 
