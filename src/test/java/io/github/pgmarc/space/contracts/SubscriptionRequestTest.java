@@ -46,55 +46,90 @@ class SubscriptionRequestTest {
     @Test
     void givenConsecutiveServiceCreationShouldThrow() {
 
-        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> SubscriptionRequest
+        SubscriptionRequest.Builder builder = SubscriptionRequest
                 .builder(TEST_USER_CONTACT)
-                .startService("test", "v1")
-                .startService("incorrect", "v1")
-                .build()).withMessage("you must build a service before creating another");
+                .startService("test", "v1");
+
+        assertThatExceptionOfType(IllegalStateException.class)
+                .isThrownBy(() -> builder.startService("incorrect", "v1"))
+                .withMessage("you must build a service before creating another");
     }
 
     @Test
     void givenPlanCallBeforeCallingCreationServiceShouldThrow() {
 
-        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> SubscriptionRequest
-                .builder(TEST_USER_CONTACT)
-                .plan("foo")
-                .build()).withMessage("you must call 'newService' before setting a plan: foo");
+        SubscriptionRequest.Builder builder = SubscriptionRequest
+                .builder(TEST_USER_CONTACT);
+
+        assertThatExceptionOfType(IllegalStateException.class)
+                .isThrownBy(() -> builder.plan("foo"))
+                .withMessage("you must call 'newService' before setting a plan: foo");
     }
 
     @Test
     void givenAddOnCallBeforeCallingCreationServiceShouldThrow() {
 
-        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> SubscriptionRequest
-                .builder(TEST_USER_CONTACT)
-                .addOn("foo", 1)
-                .build()).withMessage("you must call 'newService' before setting an add-on: foo");
+        SubscriptionRequest.Builder builder = SubscriptionRequest
+                .builder(TEST_USER_CONTACT);
+
+        assertThatExceptionOfType(IllegalStateException.class)
+                .isThrownBy(() -> builder.addOn("foo", 1))
+                .withMessage("you must call 'newService' before setting an add-on: foo");
 
     }
 
     @Test
     void givenServiceBuildCallBeforeCreationServiceShouldThrow() {
 
-        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> SubscriptionRequest
-                .builder(TEST_USER_CONTACT)
-                .endService()
-                .build()).withMessage("you must call 'newService' before adding a service");
+        SubscriptionRequest.Builder builder = SubscriptionRequest.builder(TEST_USER_CONTACT);
+
+        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> builder
+                .endService())
+                .withMessage("you must call 'newService' before adding a service");
     }
 
     @Test
     void whenNoRequiredParametersInputShouldThrow() {
 
-        assertThatExceptionOfType(NullPointerException.class).isThrownBy(() -> SubscriptionRequest.builder(null)
-                .build()).withMessage("userContact must not be null");
+        SubscriptionRequest.Builder builder = SubscriptionRequest.builder(null);
+
+        assertThatExceptionOfType(NullPointerException.class)
+                .isThrownBy(() -> builder.build())
+                .withMessage("userContact must not be null");
     }
 
     @Test
     void givenOptionalRenewalDaysShouldNotThrow() {
 
-        assertThat(SubscriptionRequest.builder(TEST_USER_CONTACT)
+        SubscriptionRequest subReq = SubscriptionRequest.builder(TEST_USER_CONTACT)
                 .renewIn(null)
-                .build().getRenewalDays()).isNull();
+                .startService("foo", "bar").plan("baz")
+                .endService().build();
 
+        assertThat(subReq.getRenewalDays()).isNull();
+
+    }
+
+    @Test
+    void givenNoEndServiceShouldThrow() {
+
+        SubscriptionRequest.Builder builder = SubscriptionRequest.builder(TEST_USER_CONTACT)
+                .renewIn(null)
+                .startService("foo", "bar").plan("baz");
+
+        assertThatExceptionOfType(IllegalStateException.class)
+                .isThrownBy(() -> builder.build())
+                .withMessage("finish the creation of your service by calling endService");
+    }
+
+    @Test
+    void foo() {
+
+        SubscriptionRequest.Builder builder = SubscriptionRequest.builder(TEST_USER_CONTACT);
+
+        assertThatExceptionOfType(IllegalStateException.class)
+                .isThrownBy(() -> builder.build())
+                .withMessage("you have to be subscribed al least to one service");
     }
 
 }
