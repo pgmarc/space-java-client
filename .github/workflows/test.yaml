@@ -9,7 +9,18 @@ jobs:
     - name: Set up Java
       uses: actions/setup-java@v4
       with:
-        java-version: '11'
+        java-version: |
+          11
+          17
         distribution: 'temurin'
+    - name: Print JAVA_HOME locations
+      run: echo "11) $JAVA_HOME_11_X64 17) $JAVA_HOME_17_X64"
     - name: Run tests
-      run: mvn test
+      env:
+        SONAR_JAVA_JDKHOME: $JAVA_HOME_11_X64
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: >-
+        mvn -B verify sonar:sonar
+        -Dsonar.java.jdkHome=$JAVA_HOME_11_X64
+        -Dsonar.projectKey=pgmarc_space-java-client
+        -Pcoverage
