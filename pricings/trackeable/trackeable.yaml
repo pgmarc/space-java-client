@@ -1,0 +1,48 @@
+saasName: Renewable and Non-Renewable
+syntaxVersion: "3.0"
+createdAt: 2025-08-20
+version: v1
+currency: USD
+features:
+  latexEditor:
+    type: DOMAIN
+    valueType: BOOLEAN
+    defaultValue: true
+  inviteGuests:
+    type: DOMAIN
+    valueType: BOOLEAN
+    defaultValue: false
+usageLimits:
+  pdfCompileLimit:
+    type: RENEWABLE
+    valueType: NUMERIC
+    defaultValue: 100
+    period:
+      value: 1
+      unit: MONTH
+    unit: hour
+    linkedFeatures:
+    - latexEditor
+  guestsLimit:
+    type: NON_RENEWABLE
+    valueType: NUMERIC
+    defaultValue: 5
+    trackable: true
+    unit: hour
+    linkedFeatures:
+    - inviteGuests
+plans:
+  FREE:
+    price: 0
+    features: null
+    usageLimits: null
+  PRO:
+    price: 14.99
+    features:
+      inviteGuests:
+        value: true
+    usageLimits:
+      guestsLimit:
+        value: 15
+      pdfCompileLimit:
+        value: 3000

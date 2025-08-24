@@ -1,0 +1,87 @@
+@domain = localhost
+@port = 5403
+@host = {{domain}}:{{port}}
+@path = api/v1
+
+###
+// @name login
+// @prompt username
+// @prompt password
+POST http://{{host}}/{{path}}/users/authenticate
+Accept: application/json
+Content-Type: application/json
+
+{
+  "username": "{{username}}",
+  "password": "{{password}}"
+}
+
+###
+
+GET http://{{host}}/{{path}}/services
+x-api-key: {{login.response.body.$.apiKey}}
+Accept: application/json
+
+###
+@serviceName = WireMock
+GET http://{{host}}/{{path}}/services/{{serviceName}}
+x-api-key: {{login.response.body.$.apiKey}}
+Accept: application/json
+
+###
+
+GET http://{{host}}/{{path}}/contracts
+x-api-key: {{login.response.body.$.apiKey}}
+Accept: application/json
+
+### 
+
+POST http://{{host}}/{{path}}/contracts
+x-api-key: {{login.response.body.$.apiKey}}
+Accept: application/json
+Content-Type: application/json
+
+{
+  "userContact": {
+    "userId": "4242424242",
+    "username": "janedoe" 
+  },
+  "billingPeriod": {
+    "autoRenew": true,
+    "renewalDays": 365
+  },
+  "contractedServices": {
+    "Scalable Add-on": "v1"
+  },
+  "subscriptionPlans": {},
+  "subscriptionAddOns": {
+    "Scalable Add-on": {
+      "addOnA": 5
+    }
+  }
+}
+
+###
+@userId = 4242424242
+GET http://{{host}}/{{path}}/contracts/{{userId}}
+//x-api-key: {{login.response.body.$.apiKey}}
+Accept: application/json
+
+###
+@userId = 4242424242
+PUT http://{{host}}/{{path}}/contracts/{{userId}}
+x-api-key: {{login.response.body.$.apiKey}}
+Accept: application/json
+Content-Type: application/json
+
+{
+  "contractedServices": {
+    "Boolean pricing": "v1",
+    "Renewable and Non-Renewable": "v1"
+  },
+  "subscriptionPlans": {
+    "Boolean pricing": "PRO",
+    "Renewable and Non-Renewable": "PRO"
+  },
+  "subscriptionAddOns": {}
+}

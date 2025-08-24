@@ -1,0 +1,38 @@
+saasName: Scalable Add-on 1
+syntaxVersion: "3.0"
+createdAt: 2025-08-20
+version: v1
+currency: USD
+features:
+  featureA:
+    type: DOMAIN
+    valueType: BOOLEAN
+    defaultValue: false
+    expression: pricingContext['features']['featureA'] &&
+      (subscriptionContext['usageLimits']['maxLimitA']) < pricingContext['usageLimits']['maxLimitA'])
+usageLimits:
+  maxLimitA:
+    type: RENEWABLE
+    valueType: NUMERIC
+    defaultValue: 0
+    period:
+      value: 1
+      unit: MONTH
+    unit: something
+    linkedFeatures:
+    - featureA
+addOns:
+  addOnA:
+    subscriptionConstraints:
+      minQuantity: 2
+      maxQuantity: 10
+      quantityStep: 2
+    price: 14.99
+    features:
+      featureA:
+        value: true
+    usageLimits:
+      maxLimitA:
+        value: 10
+    
+

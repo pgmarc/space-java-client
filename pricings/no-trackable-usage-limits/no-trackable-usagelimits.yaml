@@ -1,0 +1,35 @@
+saasName: Boolean pricing
+syntaxVersion: "3.0"
+createdAt: 2025-08-20
+version: v1
+currency: USD
+features:
+  onlineMeetings:
+    type: DOMAIN
+    valueType: BOOLEAN
+    defaultValue: true
+  inviteOutsiders:
+    type: DOMAIN
+    valueType: BOOLEAN
+    defaultValue: false
+usageLimits:
+  meetingsDuration:
+    type: NON_RENEWABLE
+    valueType: NUMERIC
+    defaultValue: 1
+    unit: hour
+    linkedFeatures:
+    - onlineMeetings
+plans:
+  FREE:
+    price: 0
+    features: null
+    usageLimits: null
+  PRO:
+    price: 14.99
+    features:
+      inviteOutsiders:
+        value: true
+    usageLimits:
+      meetingsDuration:
+        value: 5
