@@ -13,11 +13,20 @@ jobs:
           11
           17
         distribution: 'temurin'
-    - name: Print JAVA_HOME locations
-      run: echo "11) $JAVA_HOME_11_X64 17) $JAVA_HOME_17_X64"
-    - name: Run tests
+    - name: Cache SonarQube packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.sonar/cache
+        key: ${{ runner.os }}-sonar
+        restore-keys: ${{ runner.os }}-sonar
+    - name: Cache Maven packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+    - name: Build and analyze
       env:
-        SONAR_JAVA_JDKHOME: $JAVA_HOME_11_X64
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: >-
         mvn -B verify sonar:sonar
