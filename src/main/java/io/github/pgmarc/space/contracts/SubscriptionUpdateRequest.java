@@ -34,7 +34,7 @@ public class SubscriptionUpdateRequest {
 
     public SubscriptionUpdateRequest addOn(String name, long quantity) {
         Objects.requireNonNull(serviceBuilder, "you call service first");
-        this.serviceBuilder.addOn(name, 0);
+        this.serviceBuilder.addOn(name, quantity);
         return this;
     }
 
