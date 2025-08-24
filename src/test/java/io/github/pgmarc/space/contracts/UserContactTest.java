@@ -42,8 +42,10 @@ class UserContactTest {
     @ValueSource(strings = { "", "ab", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" })
     void givenInvalidUsernamesShouldThrow(String username) {
 
+        UserContact.Builder builder = UserContact.builder(TEST_USER_ID, username);
+
         assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> UserContact.builder(TEST_USER_ID, username).build());
+                .isThrownBy(() -> builder.build());
 
     }
 

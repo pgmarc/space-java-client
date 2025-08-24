@@ -16,17 +16,20 @@ class BillingPeriodTest {
     void givenZeroRenewalDaysShouldThrow() {
 
         BillingPeriod period = BillingPeriod.of(start, end);
+        Duration duration = Duration.ofHours(12);
 
         assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> period.setRenewalDays(Duration.ofHours(12)))
+                .isThrownBy(() -> period.setRenewalDays(duration))
                 .withMessage("your subscription cannot expire in less than one day");
     }
 
     @Test
     void givenStartDateAfterEndDateShouldThrow() {
 
+        ZonedDateTime end = start.minusDays(1);
+
         assertThatExceptionOfType(IllegalStateException.class)
-                .isThrownBy(() -> BillingPeriod.of(start, start.minusDays(1)))
+                .isThrownBy(() -> BillingPeriod.of(start, end))
                 .withMessage("startDate is after endDate");
     }
 

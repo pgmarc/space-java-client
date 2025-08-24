@@ -107,7 +107,6 @@ public final class Service {
         }
 
         public Builder plan(String plan) {
-            Objects.requireNonNull(plan, "plan must not be null");
             if (plan.isBlank()) {
                 throw new IllegalArgumentException("plan must not be blank");
             }

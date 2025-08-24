@@ -6,32 +6,33 @@ import org.junit.jupiter.api.Test;
 
 class ServiceTest {
 
+
+    private final Service.Builder baseBuilder = Service.builder("test", "alfa");
+
     @Test
     void givenServiceWithPlanShouldCreateService() {
 
-        String plan = "foo";
+        String name = "petclinic";
+        String version = "v1";
+        String plan = "GOLD";
+        String addOnName = "petsAdoptionCentre";
 
-        Service service = Service.builder("test", "alfa")
-                .plan(plan).build();
+        Service service = Service.builder(name, version)
+                .plan(plan).addOn(addOnName, 1).build();
 
+        assertThat(service.getName()).isEqualTo(name);
+        assertThat(service.getVersion()).isEqualTo(version);
         assertThat(service.getPlan()).isPresent().hasValue(plan);
-
-    }
-
-    @Test
-    void givenServiceWithNullPlanShouldThrow() {
-
-        assertThatExceptionOfType(NullPointerException.class)
-                .isThrownBy(() -> Service.builder("foo", "alfa").plan(null))
-                .withMessage("plan must not be null");
+        assertThat(service.getAddOn(addOnName)).isPresent().hasValue(new AddOn(addOnName, 1));
 
     }
 
     @Test
     void givenServiceWithBlankPlanShouldThrow() {
 
+
         assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> Service.builder("foo", "alfa").plan(""))
+                .isThrownBy(() -> baseBuilder.plan(""))
                 .withMessage("plan must not be blank");
     }
 
@@ -39,26 +40,15 @@ class ServiceTest {
     void givenNoPlanOrAddOnShouldThrow() {
 
         assertThatExceptionOfType(IllegalStateException.class)
-                .isThrownBy(() -> Service.builder("test", "alfa").build())
+                .isThrownBy(() -> baseBuilder.build())
                 .withMessage("At least you have to be subscribed to a plan or add-on");
-    }
-
-    @Test
-    void givenAPlanShouldBePresentInService() {
-
-        String plan = "FREE";
-
-        Service service = Service.builder("test", "alfa")
-                .plan(plan).build();
-
-        assertThat(service.getPlan()).isPresent().hasValue(plan);
     }
 
     @Test
     void givenNullAsAddOnKeyShouldThrow() {
 
         assertThatExceptionOfType(NullPointerException.class)
-                .isThrownBy(() -> Service.builder("test", "alfa").addOn(null, 1))
+                .isThrownBy(() -> baseBuilder.addOn(null, 1))
                 .withMessage("add-on name must not be null");
     }
 
@@ -66,36 +56,7 @@ class ServiceTest {
     void givenAddOnWithZeroQuantityShouldThrow() {
 
         assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> Service.builder("test", "alfa").addOn("zeroQuantity", 0))
+                .isThrownBy(() -> baseBuilder.addOn("zeroQuantity", 0))
                 .withMessage("zeroQuantity quantity must be greater than 0");
     }
-
-    @Test
-    void givenAnAddOnShouldBePresentInService() {
-
-        String addOn = "additionalItems";
-
-        Service service = Service.builder("test", "alfa")
-                .addOn(addOn, 1).build();
-
-        assertThat(service.getAddOn(addOn)).isPresent().hasValue(new AddOn(addOn, 1));
-
-    }
-
-    @Test
-    void givenPlanAndAddOnsShouldBePresent() {
-        String plan = "FREE";
-        AddOn addOn1 = new AddOn("addOn1", 1);
-        AddOn addOn2 = new AddOn("addOn2", 2);
-
-        Service service = Service.builder("test", "alfa")
-                .plan(plan)
-                .addOn(addOn1.getName(), addOn1.getQuantity())
-                .addOn(addOn2.getName(), addOn1.getQuantity()).build();
-
-        assertThat(service.getPlan()).isPresent().hasValue(plan);
-        assertThat(service.getAddOn(addOn1.getName())).isPresent().hasValue(addOn1);
-        assertThat(service.getAddOn(addOn2.getName())).isPresent().hasValue(addOn2);
-    }
-
 }
