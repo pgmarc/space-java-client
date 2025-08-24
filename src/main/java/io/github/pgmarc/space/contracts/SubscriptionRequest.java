@@ -90,7 +90,13 @@ public final class SubscriptionRequest {
         }
 
         public SubscriptionRequest build() {
+            if (isServiceBuilderAlive()) {
+                throw new IllegalStateException("finish the creation of your service by calling endService");
+            }
             Objects.requireNonNull(userContact, "userContact must not be null");
+            if (services.isEmpty()) {
+                throw new IllegalStateException("you have to be subscribed al least to one service");
+            }
             return new SubscriptionRequest(this);
         }
 
