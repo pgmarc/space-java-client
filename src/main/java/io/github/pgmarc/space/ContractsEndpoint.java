@@ -1,10 +1,13 @@
-package io.github.pgmarc.space.contracts;
+package io.github.pgmarc.space;
 
 import java.io.IOException;
 import java.util.Objects;
 
 import org.json.JSONObject;
 
+import io.github.pgmarc.space.contracts.Subscription;
+import io.github.pgmarc.space.contracts.SubscriptionRequest;
+import io.github.pgmarc.space.contracts.SubscriptionUpdateRequest;
 import io.github.pgmarc.space.deserializers.ErrorDeserializer;
 import io.github.pgmarc.space.deserializers.SubscriptionDeserializer;
 import io.github.pgmarc.space.exceptions.SpaceApiException;
@@ -33,7 +36,7 @@ public final class ContractsEndpoint {
     private final ErrorDeserializer errorDeserializer = new ErrorDeserializer();
     private final Headers requiredHeaders;
 
-    public ContractsEndpoint(OkHttpClient client, HttpUrl baseUrl, String apiKey) {
+    ContractsEndpoint(OkHttpClient client, HttpUrl baseUrl, String apiKey) {
         this.client = client;
         this.baseUrl = baseUrl;
         this.requiredHeaders = new Headers.Builder().add("Accept", JSON.toString())
