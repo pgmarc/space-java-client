@@ -13,6 +13,8 @@ jobs:
           11
           17
         distribution: 'temurin'
+    - name: Run tests
+      run: mvn --batch-mode test
     - name: Cache SonarQube packages
       uses: actions/cache@v4
       with:
@@ -26,10 +28,11 @@ jobs:
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
         restore-keys: ${{ runner.os }}-m2
     - name: Build and analyze
+      if: ${{ github.ref == 'refs/heads/main' }}
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: >-
-        mvn -B verify sonar:sonar
+        mvn --batch-mode verify sonar:sonar
         -Dsonar.java.jdkHome=$JAVA_HOME_11_X64
         -Dsonar.projectKey=pgmarc_space-java-client
         -Pcoverage
