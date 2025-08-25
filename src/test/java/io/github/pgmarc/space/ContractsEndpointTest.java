@@ -1,4 +1,4 @@
-package io.github.pgmarc.space.contracts;
+package io.github.pgmarc.space;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -9,6 +9,10 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 
+import io.github.pgmarc.space.contracts.Subscription;
+import io.github.pgmarc.space.contracts.SubscriptionRequest;
+import io.github.pgmarc.space.contracts.SubscriptionUpdateRequest;
+import io.github.pgmarc.space.contracts.UserContact;
 import io.github.pgmarc.space.exceptions.SpaceApiException;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
