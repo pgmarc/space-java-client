@@ -19,3 +19,11 @@ buildNumber.properties
 # VSCode
 
 .vscode
+
+# Intellij
+.idea/
+*.iml
+*.iws
+
+# Mac
+.DS_Store
