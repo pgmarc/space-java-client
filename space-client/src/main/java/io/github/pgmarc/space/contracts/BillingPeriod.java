@@ -31,8 +31,13 @@ public final class BillingPeriod {
         return renewalDays;
     }
 
-    boolean isExpired(LocalDateTime dateTime) {
-        return endDate.isAfter(ZonedDateTime.of(dateTime, ZoneId.of("UTC")));
+    boolean isActive(ZonedDateTime date) {
+        return  (startDate.isEqual(date) || startDate.isBefore(date)) &&
+                (endDate.isAfter(date) || endDate.isEqual(date));
+    }
+
+    boolean isExpired(ZonedDateTime date) {
+        return startDate.isBefore(date) && endDate.isBefore(date);
     }
 
     boolean isAutoRenewable() {

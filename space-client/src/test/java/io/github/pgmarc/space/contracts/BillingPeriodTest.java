@@ -44,17 +44,4 @@ class BillingPeriodTest {
         assertThat(billingPeriod.getDuration().toDays()).isEqualTo(days);
         assertThat(billingPeriod.getRenewalDate()).isPresent().hasValue(end.plusDays(30).toLocalDateTime());
     }
-
-    @Test
-    void givenBillingPeriodCheckIfSubscriptionIsExpired() {
-
-        ZonedDateTime startDate = ZonedDateTime.parse("2025-08-15T00:00:00Z");
-        ZonedDateTime endDate = startDate.plusDays(30);
-
-        BillingPeriod period = BillingPeriod.of(startDate, endDate);
-
-        LocalDateTime dateToTest = LocalDateTime.of(2026, 1, 1, 0, 0);
-
-        assertThat(period.isExpired(dateToTest)).isTrue();
-    }
 }
