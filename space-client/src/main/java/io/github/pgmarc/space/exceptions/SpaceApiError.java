@@ -7,15 +7,15 @@ public class SpaceApiError {
 
     private final Set<String> messages;
 
-    private final int code;
+    private final int statusCode;
 
     public SpaceApiError(int code, Set<String> messages) {
-        this.code = code;
+        this.statusCode = code;
         this.messages = Collections.unmodifiableSet(messages);
     }
 
-    int getCode() {
-        return code;
+    int getStatusCode() {
+        return statusCode;
     }
 
     @Override

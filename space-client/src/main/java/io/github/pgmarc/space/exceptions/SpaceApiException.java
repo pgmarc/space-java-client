@@ -3,14 +3,18 @@ package io.github.pgmarc.space.exceptions;
 
 public class SpaceApiException extends RuntimeException {
 
-    private final transient SpaceApiError error;
+    private transient SpaceApiError error;
 
     public SpaceApiException(SpaceApiError error) {
         super(error.toString());
         this.error = error;
     }
 
+    public SpaceApiException(String message) {
+        super(message);
+    }
+
     public int getCode() {
-        return error.getCode();
+        return error.getStatusCode();
     }
 }
