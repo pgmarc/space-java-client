@@ -57,10 +57,11 @@ public class SubscriptionRequestSerializer implements JsonSerializable<Subscript
     public static Map<String, String> subscriptionPlans(Set<Service> services) {
         Map<String, String> res = new HashMap<>();
         for (Service service : services) {
-            if (service.getPlan().isEmpty()) {
+            Optional<String> plan = service.getPlan();
+            if (plan.isEmpty()) {
                 continue;
             }
-            res.put(service.getName(), service.getPlan().get());
+            res.put(service.getName(), plan.get());
         }
         return Collections.unmodifiableMap(res);
 

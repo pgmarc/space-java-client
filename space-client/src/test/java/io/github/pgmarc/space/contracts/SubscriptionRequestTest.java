@@ -83,8 +83,7 @@ class SubscriptionRequestTest {
 
         SubscriptionRequest.Builder builder = SubscriptionRequest.builder(TEST_USER_CONTACT);
 
-        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> builder
-                .endService())
+        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(builder::endService)
                 .withMessage("you must call 'newService' before adding a service");
     }
 
@@ -94,7 +93,7 @@ class SubscriptionRequestTest {
         SubscriptionRequest.Builder builder = SubscriptionRequest.builder(null);
 
         assertThatExceptionOfType(NullPointerException.class)
-                .isThrownBy(() -> builder.build())
+                .isThrownBy(builder::build)
                 .withMessage("userContact must not be null");
     }
 
@@ -118,7 +117,7 @@ class SubscriptionRequestTest {
                 .startService("foo", "bar").plan("baz");
 
         assertThatExceptionOfType(IllegalStateException.class)
-                .isThrownBy(() -> builder.build())
+                .isThrownBy(builder::build)
                 .withMessage("finish the creation of your service by calling endService");
     }
 
@@ -128,7 +127,7 @@ class SubscriptionRequestTest {
         SubscriptionRequest.Builder builder = SubscriptionRequest.builder(TEST_USER_CONTACT);
 
         assertThatExceptionOfType(IllegalStateException.class)
-                .isThrownBy(() -> builder.build())
+                .isThrownBy(builder::build)
                 .withMessage("you have to be subscribed al least to one service");
     }
 

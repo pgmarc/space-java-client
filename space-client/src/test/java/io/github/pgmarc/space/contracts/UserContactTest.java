@@ -45,7 +45,7 @@ class UserContactTest {
         UserContact.Builder builder = UserContact.builder(TEST_USER_ID, username);
 
         assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> builder.build());
+                .isThrownBy(builder::build);
 
     }
 
