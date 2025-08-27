@@ -9,6 +9,10 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
+    <properties>
+        <sonar.skip>true</sonar.skip>
+    </properties>
+
 	<artifactId>space-client-examples</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<name>space-client-examples</name>

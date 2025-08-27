@@ -32,7 +32,7 @@ jobs:
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         SONAR_HOST_URL: https://sonarcloud.io
-      run: mvn --projects space-client --batch-mode verify sonar:sonar
+      run: mvn --batch-mode verify sonar:sonar
         -Dsonar.organization=pgmarc
         -Dsonar.projectKey=pgmarc_space-java-client
         -Dsonar.java.jdkHome=$JAVA_HOME_11_X64
