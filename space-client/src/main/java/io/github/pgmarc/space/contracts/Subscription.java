@@ -2,6 +2,8 @@ package io.github.pgmarc.space.contracts;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -55,8 +57,23 @@ public final class Subscription {
         return billingPeriod.isAutoRenewable();
     }
 
+    /**
+     * Checks whether a <code>date</code> is within the subscription interval.
+     * A subscription is active if <code>date</code> is between subscription
+     * start date and end date (both boundaries are inclusive).
+     */
+    public boolean isActive(LocalDateTime date) {
+        Objects.requireNonNull(date, "date must not be null");
+        return billingPeriod.isActive(ZonedDateTime.of(date, ZoneId.of("UTC")));
+    }
+
+    /**
+     * A subscription has expired if given <code>date</code> is after
+     * subscription interval.
+     */
     public boolean isExpired(LocalDateTime date) {
-        return billingPeriod.isExpired(date);
+        Objects.requireNonNull(date, "date must not be null");
+        return billingPeriod.isExpired(ZonedDateTime.of(date, ZoneId.of("UTC")));
     }
 
     public Optional<LocalDateTime> getRenewalDate() {
