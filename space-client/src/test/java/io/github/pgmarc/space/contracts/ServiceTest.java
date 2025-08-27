@@ -40,7 +40,7 @@ class ServiceTest {
     void givenNoPlanOrAddOnShouldThrow() {
 
         assertThatExceptionOfType(IllegalStateException.class)
-                .isThrownBy(() -> baseBuilder.build())
+                .isThrownBy(baseBuilder::build)
                 .withMessage("At least you have to be subscribed to a plan or add-on");
     }
 
