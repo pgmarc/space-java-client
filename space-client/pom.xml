@@ -13,13 +13,6 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>space-client</name>
 
-	<scm>
-		<connection>scm:git:git://github.com/pgmarc/space-java-client.git</connection>
-		<developerConnection>scm:git:ssh://github.com/pgmarc/space-java-client.git</developerConnection>
-		<url>https://github.com/pgmarc/space-java-client/tree/main</url>
-		<tag>HEAD</tag>
-	</scm>
-
 	<properties>
         <org.json.version>20250517</org.json.version>
         <okhttp.version>5.1.0</okhttp.version>
