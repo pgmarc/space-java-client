@@ -9,6 +9,12 @@ import java.util.*;
 
 public class FeatureEvaluationDeserializer implements JsonDeserializable<FeatureEvaluationResult> {
 
+    private final int serviceLength;
+
+    public FeatureEvaluationDeserializer(int serviceLength) {
+        this.serviceLength = serviceLength;
+    }
+
     private enum Keys {
         EVAL("eval"),
         ERROR("error"),
@@ -40,19 +46,27 @@ public class FeatureEvaluationDeserializer implements JsonDeserializable<Feature
         }
 
         boolean available = json.getBoolean(Keys.EVAL.toString());
-        JSONObject jsonUsed = json.optJSONObject(Keys.USED.toString());
-        Map<String,Number> used = jsonUsed != null ? numberMapFromJson(jsonUsed) : Map.of();
-        JSONObject jsonLimit =  json.optJSONObject(Keys.LIMIT.toString());
-        Map<String,Number> limit = jsonLimit != null ? numberMapFromJson(jsonLimit) : Map.of();
+        Map<String, FeatureEvaluationResult.Usage> quotas = featureQuotasFromJson(json, serviceLength);
 
-        return FeatureEvaluationResult.of(available, used, limit);
+        return FeatureEvaluationResult.of(available, quotas);
     }
 
-    private static Map<String,Number> numberMapFromJson(JSONObject jsonObject) {
-        Map<String,Number> res = new HashMap<>();
-        for (String key : jsonObject.keySet()) {
-            res.put(key, jsonObject.getNumber(key));
+    private static  Map<String, FeatureEvaluationResult.Usage> featureQuotasFromJson(JSONObject json, int serviceNameLength) {
+        Map<String, FeatureEvaluationResult.Usage> res = new HashMap<>();
+
+        if (json.isNull(Keys.USED.toString())) {
+            return res;
         }
+
+        for (String usageLimitId : json.getJSONObject(Keys.USED.toString()).keySet()) {
+            String usedJsonPointer = "/" + Keys.USED + "/" + usageLimitId;
+            String limitJsonPointer = "/" + Keys.LIMIT + "/" + usageLimitId;
+            String usageLimit = usageLimitId.substring(serviceNameLength + 1);
+            Number used = (Number) json.query(usedJsonPointer);
+            Number limit = (Number) json.query(limitJsonPointer);
+            res.put(usageLimit, FeatureEvaluationResult.Usage.of(used, limit));
+        }
+
         return res;
     }
 }

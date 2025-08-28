@@ -2,33 +2,64 @@ package io.github.pgmarc.space.features;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 public final class FeatureEvaluationResult {
 
     private final boolean available;
-    private final Map<String, Number> used;
-    private final Map<String, Number> limit;
+    private final Map<String,Usage> quotas;
 
-    private FeatureEvaluationResult(boolean available, Map<String,Number> used, Map<String,Number> limit) {
+    private FeatureEvaluationResult(boolean available, Map<String,Usage> quotas) {
         this.available = available;
-        this.used = Collections.unmodifiableMap(used);
-        this.limit = Collections.unmodifiableMap(limit);
+        this.quotas = quotas;
     }
 
     public boolean isAvailable() {
         return available;
     }
 
-    public Number getConsumed(String usageLimit) {
-        return used.get(usageLimit);
+    public Map<String,Usage> getQuotas() {
+        return Collections.unmodifiableMap(quotas);
     }
 
-    public Number getLimit(String usageLimit) {
-        return limit.get(usageLimit);
+    public Optional<Number> getConsumed(String usageLimit) {
+        Objects.requireNonNull(usageLimit, "usage limit must not be null");
+        return quotas.containsKey(usageLimit) ?
+            Optional.of(quotas.get(usageLimit).getUsed()) : Optional.empty();
     }
 
-    public static FeatureEvaluationResult of(boolean available, Map<String,Number> used, Map<String,Number> limit) {
-        return new FeatureEvaluationResult(available, used, limit);
+    public Optional<Number> getLimit(String usageLimit) {
+        return quotas.containsKey(usageLimit) ?
+            Optional.of(quotas.get(usageLimit).getLimit()) : Optional.empty();
+    }
+
+
+    public static FeatureEvaluationResult of(boolean available, Map<String,Usage> quotas) {
+        return new FeatureEvaluationResult(available, quotas);
+    }
+
+    public final static class Usage {
+
+        private final Number used;
+        private final Number limit;
+
+        private Usage(Number used, Number limit) {
+            this.used = used;
+            this.limit = limit;
+        }
+
+        public Number getUsed() {
+            return used;
+        }
+
+        public Number getLimit() {
+            return limit;
+        }
+
+        public static Usage of(Number used, Number limit) {
+            return new Usage(used, limit);
+        }
     }
 
 }
