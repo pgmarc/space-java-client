@@ -42,6 +42,7 @@ public class SubscriptionTest {
         Subscription subscription = Subscription.builder(contact, billingPeriod, service)
             .addSnapshots(history).build();
 
+        assertThat(subscription.getUsername()).isEqualTo(username);
         assertThat(subscription.getStartDate()).isEqualTo(start.toLocalDateTime());
         assertThat(subscription.getEndDate()).isEqualTo(end.toLocalDateTime());
         assertThat(subscription.isAutoRenewable()).isTrue();

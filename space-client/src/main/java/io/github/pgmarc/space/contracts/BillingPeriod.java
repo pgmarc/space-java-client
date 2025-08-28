@@ -82,7 +82,7 @@ public final class BillingPeriod {
 
         private final String name;
 
-        private Keys(String name) {
+        Keys(String name) {
             this.name = name;
         }
 
@@ -93,40 +93,15 @@ public final class BillingPeriod {
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((startDate == null) ? 0 : startDate.hashCode());
-        result = prime * result + ((endDate == null) ? 0 : endDate.hashCode());
-        result = prime * result + ((renewalDays == null) ? 0 : renewalDays.hashCode());
-        return result;
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        BillingPeriod that = (BillingPeriod) o;
+        return Objects.equals(startDate, that.startDate) && Objects.equals(endDate, that.endDate) && Objects.equals(renewalDays, that.renewalDays);
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        BillingPeriod other = (BillingPeriod) obj;
-        if (startDate == null) {
-            if (other.startDate != null)
-                return false;
-        } else if (!startDate.equals(other.startDate))
-            return false;
-        if (endDate == null) {
-            if (other.endDate != null)
-                return false;
-        } else if (!endDate.equals(other.endDate))
-            return false;
-        if (renewalDays == null) {
-            if (other.renewalDays != null)
-                return false;
-        } else if (!renewalDays.equals(other.renewalDays))
-            return false;
-        return true;
+    public int hashCode() {
+        return Objects.hash(startDate, endDate, renewalDays);
     }
 
     @Override

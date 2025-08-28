@@ -13,16 +13,12 @@ public final class ErrorDeserializer implements JsonDeserializable<SpaceApiError
     private enum Keys {
         ERROR("error"),
         ERRORS("errors"),
-        CODE("statusCode"),
-        TYPE("field"),
-        MSG("msg"),
-        PATH("path"),
-        LOCATION("location"),
-        VALUE("value");
+        STATUS_CODE("statusCode"),
+        MSG("msg");
 
         private final String name;
 
-        private Keys(String name) {
+        Keys(String name) {
             this.name = name;
         }
 
@@ -47,7 +43,7 @@ public final class ErrorDeserializer implements JsonDeserializable<SpaceApiError
             }
         }
 
-        int statusCode = json.getInt(Keys.CODE.toString());
+        int statusCode = json.getInt(Keys.STATUS_CODE.toString());
 
         return new SpaceApiError(statusCode, messages);
     }
