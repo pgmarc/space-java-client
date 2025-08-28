@@ -13,6 +13,7 @@ public final class SpaceClient {
     private final String apiKey;
 
     private ContractsEndpoint contracts;
+    private FeaturesEndpoint features;
 
     private SpaceClient(OkHttpClient httpClient, HttpUrl baseUrl, String apiKey) {
         this.httpClient = httpClient;
@@ -22,9 +23,16 @@ public final class SpaceClient {
 
     public ContractsEndpoint contracts() {
         if (contracts == null) {
-            this.contracts = new ContractsEndpoint(httpClient, baseUrl, apiKey);
+            contracts = new ContractsEndpoint(httpClient, baseUrl, apiKey);
         }
         return contracts;
+    }
+
+    public FeaturesEndpoint features() {
+        if (features == null) {
+            features = new FeaturesEndpoint(httpClient, baseUrl, apiKey);
+        }
+        return features;
     }
 
     public static Builder builder(String host, String apiKey) {
