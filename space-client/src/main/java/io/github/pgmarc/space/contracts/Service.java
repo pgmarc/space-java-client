@@ -12,7 +12,7 @@ public final class Service {
     private final String name;
     private final String version;
     private final Map<String, AddOn> addOns;
-    private String plan;
+    private final String plan;
 
     private Service(Builder builder) {
         this.name = builder.name;
@@ -52,46 +52,15 @@ public final class Service {
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((name == null) ? 0 : name.hashCode());
-        result = prime * result + ((version == null) ? 0 : version.hashCode());
-        result = prime * result + ((addOns == null) ? 0 : addOns.hashCode());
-        result = prime * result + ((plan == null) ? 0 : plan.hashCode());
-        return result;
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Service service = (Service) o;
+        return Objects.equals(name, service.name) && Objects.equals(version, service.version) && Objects.equals(addOns, service.addOns) && Objects.equals(plan, service.plan);
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        Service other = (Service) obj;
-        if (name == null) {
-            if (other.name != null)
-                return false;
-        } else if (!name.equals(other.name))
-            return false;
-        if (version == null) {
-            if (other.version != null)
-                return false;
-        } else if (!version.equals(other.version))
-            return false;
-        if (addOns == null) {
-            if (other.addOns != null)
-                return false;
-        } else if (!addOns.equals(other.addOns))
-            return false;
-        if (plan == null) {
-            if (other.plan != null)
-                return false;
-        } else if (!plan.equals(other.plan))
-            return false;
-        return true;
+    public int hashCode() {
+        return Objects.hash(name, version, addOns, plan);
     }
 
     public static final class Builder {

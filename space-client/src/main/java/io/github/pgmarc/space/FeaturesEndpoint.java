@@ -77,8 +77,55 @@ public final class FeaturesEndpoint {
         return res;
     }
 
-    public JSONObject getPricingTokenByUserId() {
-        return null;
+    public enum Revert {
+        OLDEST_VALUE(false),
+        NEWEST_VALUE(true);
+
+        private final boolean latest;
+
+        Revert(boolean latest) {
+            this.latest = latest;
+        }
+
+        public boolean isLatest() {
+            return latest;
+        }
     }
 
+    public boolean revert(String userId, String service, String feature, Revert revert) throws IOException {
+        HttpUrl url = this.baseUrl.newBuilder().addEncodedPathSegment(userId)
+            .addEncodedPathSegment(formatFeatureId(service, feature))
+            .addQueryParameter("revert", String.valueOf(true))
+            .addQueryParameter("latest", String.valueOf(revert.isLatest())).build();
+
+        Request request = new Request(url, requiredHeaders ,"POST" , RequestBody.EMPTY);
+
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                JSONObject jsonResponse = new JSONObject(response.body().string());
+                jsonResponse.put(STATUS_CODE, response.code());
+                throw new SpaceApiException(errorDeserializer.fromJson(jsonResponse));
+            }
+
+            return response.code() == 204;
+        }
+
+    }
+
+    public String generatePricingTokenForUser(String userId) throws IOException {
+
+        HttpUrl url = this.baseUrl.newBuilder().addEncodedPathSegment(userId)
+            .addPathSegment("pricing-token").build();
+        Request request = new Request(url, requiredHeaders ,"POST" , RequestBody.EMPTY);
+
+        FeatureEvaluationResult res = null;
+        try (Response response = client.newCall(request).execute()) {
+            JSONObject jsonResponse = new JSONObject(response.body().string());
+            if (!response.isSuccessful()) {
+                jsonResponse.put(STATUS_CODE, response.code());
+                throw new SpaceApiException(errorDeserializer.fromJson(jsonResponse));
+            }
+            return jsonResponse.getString("pricingToken");
+        }
+    }
 }

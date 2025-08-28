@@ -78,6 +78,73 @@ class FeaturesEndpointTest extends  BaseEndpointTest {
     }
 
     @Test
+    void givenRevertNewestCallShouldCompleteSucessfully() {
+        String userId = "e8e053c5-fd2b-4e4c-85a0-f1a52f0da72e";
+        String featureId = "petclinic-featureA";
+
+        wm.stubFor(post(urlPathTemplate("/features/{userId}/{featureId}"))
+            .withHeader("x-api-key", equalTo("prueba"))
+                .withRequestBody(absent())
+            .withPathParam("userId", equalTo(userId))
+            .withPathParam("featureId", equalTo(featureId))
+                .withQueryParam("revert", equalTo("true"))
+                .withQueryParam("latest", equalTo("true"))
+            .willReturn(
+                noContent()));
+
+        String service = "Petclinic";
+        String feature = "featureA";
+
+        try {
+             assertThat(endpoint.revert(userId, service, feature, FeaturesEndpoint.Revert.NEWEST_VALUE))
+                 .isTrue();
+        } catch (IOException e) {
+            fail();
+        }
+    }
+
+    @Test
+    void givenRevertOldestCallShouldCompleteSucessfully() {
+        String userId = "e8e053c5-fd2b-4e4c-85a0-f1a52f0da72e";
+        String featureId = "petclinic-featureA";
+
+        wm.stubFor(post(urlPathTemplate("/features/{userId}/{featureId}"))
+            .withHeader("x-api-key", equalTo("prueba"))
+            .withRequestBody(absent())
+            .withPathParam("userId", equalTo(userId))
+            .withPathParam("featureId", equalTo(featureId))
+            .withQueryParam("revert", equalTo("true"))
+            .withQueryParam("latest", equalTo("false"))
+            .willReturn(
+                noContent()));
+
+        String service = "Petclinic";
+        String feature = "featureA";
+
+        try {
+            assertThat(endpoint.revert(userId, service, feature, FeaturesEndpoint.Revert.OLDEST_VALUE))
+                .isTrue();
+        } catch (IOException e) {
+            fail();
+        }
+    }
+
+    @Test
     void getPricingTokenByUserId() {
+
+        String userId = "e8e053c5-fd2b-4e4c-85a0-f1a52f0da72e";
+
+        wm.stubFor(post(urlPathTemplate("/features/{userId}/pricing-token"))
+            .withHeader("x-api-key", equalTo("prueba"))
+            .withRequestBody(absent())
+            .withPathParam("userId", equalTo(userId))
+            .willReturn(
+                ok().withBodyFile("pricing-token-response.json")));
+
+        try {
+            assertThat(endpoint.generatePricingTokenForUser(userId).length()).isEqualTo(879);
+        } catch (IOException e) {
+            fail();
+        }
     }
 }
