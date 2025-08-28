@@ -36,9 +36,9 @@ public final class Subscription {
         return new Builder(userContact, billingPeriod).subscribe(service);
     }
 
-    public static Builder builder(UserContact usagerContact, BillingPeriod billingPeriod,
+    public static Builder builder(UserContact userContact, BillingPeriod billingPeriod,
             Collection<Service> services) {
-        return new Builder(usagerContact, billingPeriod).subscribeAll(services);
+        return new Builder(userContact, billingPeriod).subscribeAll(services);
     }
 
     public LocalDateTime getStartDate() {
@@ -119,7 +119,7 @@ public final class Subscription {
 
         private final String name;
 
-        private Keys(String name) {
+        Keys(String name) {
             this.name = name;
         }
 
@@ -163,9 +163,9 @@ public final class Subscription {
             return this;
         }
 
-        public Builder addSnapshots(Collection<Snapshot> snaphsots) {
-            Objects.requireNonNull(snaphsots, "snapshots must not be null");
-            this.history.addAll(snaphsots);
+        public Builder addSnapshots(Collection<Snapshot> snapshots) {
+            Objects.requireNonNull(snapshots, "snapshots must not be null");
+            this.history.addAll(snapshots);
             return this;
         }
 
@@ -184,20 +184,14 @@ public final class Subscription {
     public static final class Snapshot {
 
         private final LocalDateTime starDateTime;
-        private final LocalDateTime enDateTime;
+        private final LocalDateTime endDateTime;
         private final Map<String, Service> services;
 
-        public Snapshot(LocalDateTime startDateTime, LocalDateTime endDateTime,
+        private Snapshot(LocalDateTime startDateTime, LocalDateTime endDateTime,
                 Map<String, Service> services) {
             this.starDateTime = startDateTime;
-            this.enDateTime = endDateTime;
+            this.endDateTime = endDateTime;
             this.services = new HashMap<>(services);
-        }
-
-        private Snapshot(Subscription subscription) {
-            this.starDateTime = subscription.getStartDate();
-            this.enDateTime = subscription.getEndDate();
-            this.services = subscription.getServicesMap();
         }
 
         public LocalDateTime getStartDate() {
@@ -205,7 +199,7 @@ public final class Subscription {
         }
 
         public LocalDateTime getEndDate() {
-            return enDateTime;
+            return endDateTime;
         }
 
         public Map<String, Service> getServices() {
@@ -216,48 +210,9 @@ public final class Subscription {
             return Optional.ofNullable(services.get(name));
         }
 
-        static Snapshot of(Subscription subscription) {
-            Objects.requireNonNull(subscription, "subscription must not be null");
-            return new Snapshot(subscription);
+        public static Snapshot of(LocalDateTime startDateTime, LocalDateTime endDateTime,
+                                  Map<String, Service> services) {
+            return new Snapshot(startDateTime, endDateTime, services);
         }
-
-        @Override
-        public int hashCode() {
-            final int prime = 31;
-            int result = 1;
-            result = prime * result + ((starDateTime == null) ? 0 : starDateTime.hashCode());
-            result = prime * result + ((enDateTime == null) ? 0 : enDateTime.hashCode());
-            result = prime * result + ((services == null) ? 0 : services.hashCode());
-            return result;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj)
-                return true;
-            if (obj == null)
-                return false;
-            if (getClass() != obj.getClass())
-                return false;
-            Snapshot other = (Snapshot) obj;
-            if (starDateTime == null) {
-                if (other.starDateTime != null)
-                    return false;
-            } else if (!starDateTime.equals(other.starDateTime))
-                return false;
-            if (enDateTime == null) {
-                if (other.enDateTime != null)
-                    return false;
-            } else if (!enDateTime.equals(other.enDateTime))
-                return false;
-            if (services == null) {
-                if (other.services != null)
-                    return false;
-            } else if (!services.equals(other.services))
-                return false;
-            return true;
-        }
-
     }
-
 }

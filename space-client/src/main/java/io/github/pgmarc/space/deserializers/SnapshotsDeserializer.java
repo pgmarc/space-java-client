@@ -24,12 +24,12 @@ class SnapshotsDeserializer implements JsonDeserializable<List<Snapshot>> {
         JSONArray history = json.getJSONArray(Subscription.Keys.HISTORY.toString());
         List<Snapshot> res = new ArrayList<>();
         for (int i = 0; i < history.length(); i++) {
-            JSONObject snaphsot = history.getJSONObject(i);
+            JSONObject snapshot = history.getJSONObject(i);
             OffsetDateTime startUtc = OffsetDateTime
-                    .parse(snaphsot.getString(BillingPeriod.Keys.START_DATE.toString()));
+                    .parse(snapshot.getString(BillingPeriod.Keys.START_DATE.toString()));
             OffsetDateTime end = OffsetDateTime
-                    .parse(snaphsot.getString(BillingPeriod.Keys.END_DATE.toString()));
-            res.add(new Snapshot(startUtc.toLocalDateTime(), end.toLocalDateTime(), servicesDeserializer.fromJson(snaphsot)));
+                    .parse(snapshot.getString(BillingPeriod.Keys.END_DATE.toString()));
+            res.add(Snapshot.of(startUtc.toLocalDateTime(), end.toLocalDateTime(), servicesDeserializer.fromJson(snapshot)));
         }
         return res;
     }
