@@ -2,7 +2,7 @@ package io.github.pgmarc.space;
 
 import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
-import io.github.pgmarc.space.features.Consumption;
+import io.github.pgmarc.space.features.UsageLimitConsumption;
 import io.github.pgmarc.space.features.FeatureEvaluationResult;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
@@ -73,8 +73,8 @@ class FeaturesEndpointTest {
         String usageLimit = "featureALimit";
 
         try {
-            Consumption consumption = Consumption.builder().addInt(service, usageLimit, 100).build();
-            FeatureEvaluationResult res = endpoint.evaluateOptimistically(userId, service, feature, consumption);
+            UsageLimitConsumption usageLimitConsumption = UsageLimitConsumption.builder(service).addInt(usageLimit, 100).build();
+            FeatureEvaluationResult res = endpoint.evaluateOptimistically(userId, service, feature, usageLimitConsumption);
             assertThat(res.isAvailable()).isTrue();
             assertThat(res.getConsumed(usageLimit)).hasValue(100);
             assertThat(res.getLimit(usageLimit)).hasValue(500);

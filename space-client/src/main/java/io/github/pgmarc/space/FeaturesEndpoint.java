@@ -3,7 +3,7 @@ package io.github.pgmarc.space;
 import io.github.pgmarc.space.deserializers.ErrorDeserializer;
 import io.github.pgmarc.space.deserializers.FeatureEvaluationDeserializer;
 import io.github.pgmarc.space.exceptions.SpaceApiException;
-import io.github.pgmarc.space.features.Consumption;
+import io.github.pgmarc.space.features.UsageLimitConsumption;
 import io.github.pgmarc.space.features.FeatureEvaluationResult;
 import io.github.pgmarc.space.serializers.ConsumptionSerializer;
 import okhttp3.*;
@@ -56,11 +56,11 @@ public final class FeaturesEndpoint {
         return res;
     }
 
-    public FeatureEvaluationResult evaluateOptimistically(String userId, String service, String featureId, Consumption consumption)
+    public FeatureEvaluationResult evaluateOptimistically(String userId, String service, String featureId, UsageLimitConsumption usageLimitConsumption)
         throws IOException {
         HttpUrl url = this.baseUrl.newBuilder().addEncodedPathSegment(userId)
             .addEncodedPathSegment(formatFeatureId(service, featureId)).build();
-        RequestBody body = RequestBody.create(consumptionSerializer.toJson(consumption).toString(), JSON);
+        RequestBody body = RequestBody.create(consumptionSerializer.toJson(usageLimitConsumption).toString(), JSON);
         Request request = new Request(url, requiredHeaders ,"POST" , body);
 
         FeatureEvaluationResult res = null;

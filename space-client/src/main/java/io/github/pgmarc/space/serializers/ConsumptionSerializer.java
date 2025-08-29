@@ -1,20 +1,20 @@
 package io.github.pgmarc.space.serializers;
 
-import io.github.pgmarc.space.features.Consumption;
+import io.github.pgmarc.space.features.UsageLimitConsumption;
 import org.json.JSONObject;
 
-public final class ConsumptionSerializer implements JsonSerializable<Consumption> {
+public final class ConsumptionSerializer implements JsonSerializable<UsageLimitConsumption> {
 
-    private static String formatConsumptionKey(String serviceName, String usageLimitName) {
-        return serviceName.toLowerCase() + "-" + usageLimitName;
+    private static String formatUsageLimitConsumptionKey(String serviceName, String usageLimitName) {
+        return serviceName + "-" + usageLimitName;
     }
 
     @Override
-    public JSONObject toJson(Consumption consumption) {
+    public JSONObject toJson(UsageLimitConsumption usageLimitConsumption) {
 
         JSONObject jsonObject = new JSONObject();
-        for (Consumption.Item<?> item: consumption.getConsumption()) {
-            jsonObject.put(formatConsumptionKey(item.getServiceName(), item.getUsageLimit()), item.getQuantity());
+        for (UsageLimitConsumption.Item<? extends  Number> item: usageLimitConsumption.getConsumption()) {
+            jsonObject.put(formatUsageLimitConsumptionKey(item.getServiceName(), item.getUsageLimit()), item.getQuantity());
         }
 
         return jsonObject;
