@@ -183,9 +183,10 @@ class ContractsEndpointTest {
                                 .withBodyFile("getContractById-response.json")));
 
         SubscriptionUpdateRequest subscription = SubscriptionUpdateRequest.builder()
-                .service("petclinic", "v1")
+                .startService("petclinic", "v1")
                     .plan("GOLD")
-                .add();
+                .endService()
+                .build();
         Subscription sub;
         try {
             sub = endpoint.updateContractByUserId(userId, subscription);

@@ -69,9 +69,10 @@ public class SingleService {
 
         // Updating (novating) the contract to version of 2025
         SubscriptionUpdateRequest upReq = SubscriptionUpdateRequest.builder()
-            .service("WireMock", "2025")
+            .startService("WireMock", "2025")
                 .plan("Enterprise")
-            .add();
+            .endService()
+            .build();
 
         Subscription updatedSubscription = client.contracts().updateContractByUserId(userId, upReq);
         System.out.println(updatedSubscription);
