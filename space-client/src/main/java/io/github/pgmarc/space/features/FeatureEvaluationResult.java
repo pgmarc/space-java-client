@@ -39,7 +39,7 @@ public final class FeatureEvaluationResult {
         return new FeatureEvaluationResult(available, quotas);
     }
 
-    public final static class Usage {
+    public static final class Usage {
 
         private final Number used;
         private final Number limit;

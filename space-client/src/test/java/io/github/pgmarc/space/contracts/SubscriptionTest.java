@@ -12,7 +12,7 @@ import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.Set;
 
-public class SubscriptionTest {
+class SubscriptionTest {
 
     private static final UserContact TEST_CONTACT = UserContact.builder("123456789", "alex").build();
     private static final Service TEST_SERVICE = Service.builder("petclinic", "2025").plan("GOLD").build();

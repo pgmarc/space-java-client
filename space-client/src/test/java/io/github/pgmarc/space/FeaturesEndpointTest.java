@@ -1,8 +1,11 @@
 package io.github.pgmarc.space;
 
+import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import io.github.pgmarc.space.features.Consumption;
 import io.github.pgmarc.space.features.FeatureEvaluationResult;
+import okhttp3.HttpUrl;
+import okhttp3.OkHttpClient;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -13,12 +16,15 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Assertions.*;
 
 @WireMockTest
-class FeaturesEndpointTest extends  BaseEndpointTest {
+class FeaturesEndpointTest {
 
+    protected static final String TEST_API_KEY = "prueba";
+    protected static final OkHttpClient httpClient = new OkHttpClient.Builder().build();
     private static FeaturesEndpoint endpoint;
 
     @BeforeAll
-    static void setup() {
+    static void setup(WireMockRuntimeInfo wmRuntimeInfo) {
+        HttpUrl url = new HttpUrl.Builder().scheme("http").host("localhost").port(wmRuntimeInfo.getHttpPort()).build();
         endpoint = new FeaturesEndpoint(httpClient, url, TEST_API_KEY);
     }
 
@@ -28,7 +34,7 @@ class FeaturesEndpointTest extends  BaseEndpointTest {
         String userId = "e8e053c5-fd2b-4e4c-85a0-f1a52f0da72e";
         String featureId = "petclinic-featureA";
 
-        wm.stubFor(post(urlPathTemplate("/features/{userId}/{featureId}"))
+        stubFor(post(urlPathTemplate("/features/{userId}/{featureId}"))
             .withHeader("x-api-key", equalTo("prueba"))
             .withPathParam("userId", equalTo(userId))
             .withPathParam("featureId", equalTo(featureId))
@@ -53,7 +59,7 @@ class FeaturesEndpointTest extends  BaseEndpointTest {
         String userId = "e8e053c5-fd2b-4e4c-85a0-f1a52f0da72e";
         String featureId = "petclinic-featureA";
 
-        wm.stubFor(post(urlPathTemplate("/features/{userId}/{featureId}"))
+        stubFor(post(urlPathTemplate("/features/{userId}/{featureId}"))
             .withHeader("x-api-key", equalTo("prueba"))
             .withPathParam("userId", equalTo(userId))
             .withPathParam("featureId", equalTo(featureId))
@@ -82,7 +88,7 @@ class FeaturesEndpointTest extends  BaseEndpointTest {
         String userId = "e8e053c5-fd2b-4e4c-85a0-f1a52f0da72e";
         String featureId = "petclinic-featureA";
 
-        wm.stubFor(post(urlPathTemplate("/features/{userId}/{featureId}"))
+        stubFor(post(urlPathTemplate("/features/{userId}/{featureId}"))
             .withHeader("x-api-key", equalTo("prueba"))
                 .withRequestBody(absent())
             .withPathParam("userId", equalTo(userId))
@@ -108,7 +114,7 @@ class FeaturesEndpointTest extends  BaseEndpointTest {
         String userId = "e8e053c5-fd2b-4e4c-85a0-f1a52f0da72e";
         String featureId = "petclinic-featureA";
 
-        wm.stubFor(post(urlPathTemplate("/features/{userId}/{featureId}"))
+        stubFor(post(urlPathTemplate("/features/{userId}/{featureId}"))
             .withHeader("x-api-key", equalTo("prueba"))
             .withRequestBody(absent())
             .withPathParam("userId", equalTo(userId))
@@ -134,7 +140,7 @@ class FeaturesEndpointTest extends  BaseEndpointTest {
 
         String userId = "e8e053c5-fd2b-4e4c-85a0-f1a52f0da72e";
 
-        wm.stubFor(post(urlPathTemplate("/features/{userId}/pricing-token"))
+        stubFor(post(urlPathTemplate("/features/{userId}/pricing-token"))
             .withHeader("x-api-key", equalTo("prueba"))
             .withRequestBody(absent())
             .withPathParam("userId", equalTo(userId))

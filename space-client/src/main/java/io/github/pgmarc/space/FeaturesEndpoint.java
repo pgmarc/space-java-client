@@ -118,7 +118,6 @@ public final class FeaturesEndpoint {
             .addPathSegment("pricing-token").build();
         Request request = new Request(url, requiredHeaders ,"POST" , RequestBody.EMPTY);
 
-        FeatureEvaluationResult res = null;
         try (Response response = client.newCall(request).execute()) {
             JSONObject jsonResponse = new JSONObject(response.body().string());
             if (!response.isSuccessful()) {

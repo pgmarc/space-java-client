@@ -3,6 +3,8 @@ package io.github.pgmarc.space;
 import java.io.IOException;
 import java.time.Duration;
 
+import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
+import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -25,18 +27,18 @@ import static org.assertj.core.api.Assertions.*;
 class ContractsEndpointTest {
 
     private static final String TEST_API_KEY = "prueba";
-    private final OkHttpClient httpClient = new OkHttpClient.Builder().build();
-    private static HttpUrl url;
-    private final ContractsEndpoint endpoint = new ContractsEndpoint(httpClient, url, TEST_API_KEY);
+    private static final OkHttpClient httpClient = new OkHttpClient.Builder().build();
+    private static ContractsEndpoint endpoint;
 
     @RegisterExtension
     static WireMockExtension wm = WireMockExtension.newInstance()
-            .options(wireMockConfig().dynamicPort().globalTemplating(true))
-            .build();
+        .options(wireMockConfig().globalTemplating(true))
+        .build();
 
     @BeforeAll
     static void setUp() {
-        url = new HttpUrl.Builder().scheme("http").host("localhost").port(wm.getPort()).build();
+        HttpUrl url = new HttpUrl.Builder().scheme("http").host("localhost").port(wm.getPort()).build();
+        endpoint = new ContractsEndpoint(httpClient, url, TEST_API_KEY);
     }
 
     @Test
