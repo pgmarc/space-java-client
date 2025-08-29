@@ -183,11 +183,11 @@ public final class Subscription {
 
     public static final class Snapshot {
 
-        private final LocalDateTime starDateTime;
-        private final LocalDateTime endDateTime;
+        private final ZonedDateTime starDateTime;
+        private final ZonedDateTime endDateTime;
         private final Map<String, Service> services;
 
-        private Snapshot(LocalDateTime startDateTime, LocalDateTime endDateTime,
+        private Snapshot(ZonedDateTime startDateTime, ZonedDateTime endDateTime,
                 Map<String, Service> services) {
             this.starDateTime = startDateTime;
             this.endDateTime = endDateTime;
@@ -195,11 +195,11 @@ public final class Subscription {
         }
 
         public LocalDateTime getStartDate() {
-            return starDateTime;
+            return starDateTime.toLocalDateTime();
         }
 
         public LocalDateTime getEndDate() {
-            return endDateTime;
+            return endDateTime.toLocalDateTime();
         }
 
         public Map<String, Service> getServices() {
@@ -210,7 +210,7 @@ public final class Subscription {
             return Optional.ofNullable(services.get(name));
         }
 
-        public static Snapshot of(LocalDateTime startDateTime, LocalDateTime endDateTime,
+        public static Snapshot of(ZonedDateTime startDateTime, ZonedDateTime endDateTime,
                                   Map<String, Service> services) {
             return new Snapshot(startDateTime, endDateTime, services);
         }
