@@ -16,8 +16,8 @@ class UsageLimitConsumptionTest {
             .addFloat("floatLimit", Float.MAX_VALUE)
             .addDouble("doubleLimit", Double.MAX_VALUE)
             .build();
-        assertThat(usageLimitConsumption.getConsumption())
-            .allMatch( item -> item.getServiceName().equals(service.toLowerCase()));
+        assertThat(usageLimitConsumption.getService()).isLowerCase();
+        assertThat(usageLimitConsumption.getConsumption()).isNotEmpty();
     }
 
     @Test

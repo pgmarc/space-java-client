@@ -7,10 +7,16 @@ import java.util.Set;
 
 public final class UsageLimitConsumption {
 
+    private final String service;
     private final Set<Item<? extends  Number>> items;
 
     private UsageLimitConsumption(Builder builder) {
-        this.items = Collections.unmodifiableSet(builder.items);
+        service = builder.service;
+        items = Collections.unmodifiableSet(builder.items);
+    }
+
+    public String getService() {
+        return service;
     }
 
     public Set<Item<? extends  Number>> getConsumption() {
@@ -37,25 +43,25 @@ public final class UsageLimitConsumption {
 
         public Builder addInt(String usageLimit, int quantity) {
             validateFeatureId(usageLimit);
-            this.items.add(new Item<>(service, usageLimit, quantity));
+            this.items.add(new Item<>(usageLimit, quantity));
             return this;
         }
 
         public Builder addLong(String usageLimit, long quantity) {
             validateFeatureId(usageLimit);
-            this.items.add(new Item<>(service, usageLimit, quantity));
+            this.items.add(new Item<>(usageLimit, quantity));
             return this;
         }
 
         public Builder addFloat(String usageLimit, float quantity) {
             validateFeatureId(usageLimit);
-            this.items.add(new Item<>(service, usageLimit, quantity));
+            this.items.add(new Item<>(usageLimit, quantity));
             return this;
         }
 
         public Builder addDouble(String usageLimit, double quantity) {
             validateFeatureId(usageLimit);
-            this.items.add(new Item<>(service, usageLimit, quantity));
+            this.items.add(new Item<>(usageLimit, quantity));
             return this;
         }
 
@@ -71,18 +77,12 @@ public final class UsageLimitConsumption {
     }
 
     public static final class Item<T> {
-        private final String serviceName;
         private final String usageLimit;
         private final T quantity;
 
-        private Item(String serviceName, String usageLimit, T quantity) {
-            this.serviceName = serviceName;
+        private Item(String usageLimit, T quantity) {
             this.usageLimit = usageLimit;
             this.quantity = quantity;
-        }
-
-        public String getServiceName() {
-            return  serviceName;
         }
 
         public String getUsageLimit() {

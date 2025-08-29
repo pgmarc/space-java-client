@@ -14,7 +14,7 @@ public final class ConsumptionSerializer implements JsonSerializable<UsageLimitC
 
         JSONObject jsonObject = new JSONObject();
         for (UsageLimitConsumption.Item<? extends  Number> item: usageLimitConsumption.getConsumption()) {
-            jsonObject.put(formatUsageLimitConsumptionKey(item.getServiceName(), item.getUsageLimit()), item.getQuantity());
+            jsonObject.put(formatUsageLimitConsumptionKey(usageLimitConsumption.getService(), item.getUsageLimit()), item.getQuantity());
         }
 
         return jsonObject;
