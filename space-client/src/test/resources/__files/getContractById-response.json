@@ -10,7 +10,7 @@
     "autoRenew": false,
     "renewalDays": 30
   },
-  "usageLevel": {
+  "usageLevels": {
     "zoom": {
       "maxSeats": {
         "consumed": 10

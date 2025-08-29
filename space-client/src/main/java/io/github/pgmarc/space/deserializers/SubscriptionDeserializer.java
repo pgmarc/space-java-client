@@ -25,7 +25,7 @@ public final class SubscriptionDeserializer implements JsonDeserializable<Subscr
         BillingPeriod billingPeriod = billingSerializer.fromJson(json.getJSONObject(Subscription.Keys.BILLING_PERIOD.toString()));
         UserContact userContact = userContactDeserializer.fromJson(json.getJSONObject(Subscription.Keys.USER_CONTACT.toString()));
         Map<String, Map<String, UsageLevel>> usageLevels = usageLevelDeserializer.fromJson(
-                json.getJSONObject(Subscription.Keys.USAGE_LEVEL.toString()));
+                json.getJSONObject(Subscription.Keys.USAGE_LEVELS.toString()));
         Map<String, Service> services = servicesDeserializer.fromJson(json);
         List<Snapshot> history = historyDeserializer.fromJson(json);
         return Subscription.builder(userContact, billingPeriod, services.values())
