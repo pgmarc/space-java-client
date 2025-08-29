@@ -3,8 +3,6 @@ package io.github.pgmarc.space;
 import java.io.IOException;
 import java.time.Duration;
 
-import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
-import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -55,7 +53,7 @@ class ContractsEndpointTest {
                 .withRequestBody(matchingJsonPath("$.contractedServices"))
                 .withRequestBody(matchingJsonPath("$.subscriptionPlans"))
                 .withRequestBody(matchingJsonPath("$.subscriptionAddOns"))
-                .willReturn(
+            .willReturn(
                         created()
                                 .withHeader("Content-Type", "application/json")
                                 .withBodyFile("addContracts-response.hbs")));
@@ -70,13 +68,13 @@ class ContractsEndpointTest {
         SubscriptionRequest subReq = SubscriptionRequest.builder(userContact)
                 .renewIn(Duration.ofDays(45))
                 .startService("zoom", "2025")
-                .plan("ENTERPRISE")
-                .addOn("extraSeats", 2)
-                .addOn("hugeMeetings", 1)
+                    .plan("ENTERPRISE")
+                    .addOn("extraSeats", 2)
+                    .addOn("hugeMeetings", 1)
                 .endService()
                 .startService("petclinic", "2024")
-                .plan("GOLD")
-                .addOn("petsAdoptionCentre", 1)
+                    .plan("GOLD")
+                    .addOn("petsAdoptionCentre", 1)
                 .endService()
                 .build();
 
@@ -111,7 +109,7 @@ class ContractsEndpointTest {
 
         SubscriptionRequest subReq = SubscriptionRequest.builder(userContact)
                 .startService("err", "v1")
-                .plan("Error")
+                    .plan("Error")
                 .endService()
                 .build();
 
@@ -186,7 +184,7 @@ class ContractsEndpointTest {
 
         SubscriptionUpdateRequest subscription = SubscriptionUpdateRequest.builder()
                 .service("petclinic", "v1")
-                .plan("GOLD")
+                    .plan("GOLD")
                 .add();
         Subscription sub;
         try {

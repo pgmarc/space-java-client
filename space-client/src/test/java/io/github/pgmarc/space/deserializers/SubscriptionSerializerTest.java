@@ -32,7 +32,7 @@ class SubscriptionSerializerTest {
                         "endDate", "2025-12-31T00:00:00Z",
                         "autoRenew", true,
                         "renewalDays", 365),
-                "usageLevel", Map.of(
+                "usageLevels", Map.of(
                         "zoom", Map.of(
                                 "maxSeats", Map.of("consumed", 10)),
                         "petclinic", Map.of(

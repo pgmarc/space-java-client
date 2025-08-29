@@ -114,7 +114,7 @@ public final class Subscription {
         CONTRACTED_SERVICES("contractedServices"),
         SUBSCRIPTION_PLANS("subscriptionPlans"),
         SUBSCRIPTION_ADDONS("subscriptionAddOns"),
-        USAGE_LEVEL("usageLevel"),
+        USAGE_LEVELS("usageLevels"),
         HISTORY("history");
 
         private final String name;
