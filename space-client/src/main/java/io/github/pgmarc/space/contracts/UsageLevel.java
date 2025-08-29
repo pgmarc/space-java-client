@@ -9,15 +9,15 @@ public final class UsageLevel {
 
     private final String name;
     private final double consumed;
-    private ZonedDateTime resetTimestamp;
+    private final ZonedDateTime resetTimestamp;
 
     public enum Keys {
         CONSUMED("consumed"),
-        RESET_TIMESTAMP("resetTimestamp");
+        RESET_TIMESTAMP("resetTimeStamp");
 
         private final String name;
 
-        private Keys(String name) {
+        Keys(String name) {
             this.name = name;
         }
 
@@ -63,5 +63,17 @@ public final class UsageLevel {
     public static UsageLevel of(String name, double consumed, ZonedDateTime resetTimestamp) {
         validateUsageLevel(name, consumed);
         return new UsageLevel(name, consumed, resetTimestamp);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        UsageLevel that = (UsageLevel) o;
+        return Double.compare(consumed, that.consumed) == 0 && Objects.equals(name, that.name) && Objects.equals(resetTimestamp, that.resetTimestamp);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, consumed, resetTimestamp);
     }
 }

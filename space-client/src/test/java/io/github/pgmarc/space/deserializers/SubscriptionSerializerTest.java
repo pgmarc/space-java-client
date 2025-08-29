@@ -1,15 +1,19 @@
 package io.github.pgmarc.space.deserializers;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 
+import io.github.pgmarc.space.contracts.UsageLevel;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
 import io.github.pgmarc.space.contracts.Subscription;
+
+import static org.assertj.core.api.Assertions.*;
+
 
 class SubscriptionSerializerTest {
 
@@ -17,6 +21,10 @@ class SubscriptionSerializerTest {
 
     @Test
     void givenSubscriptionAsJsonShouldCreateSubscription() {
+
+        String maxVisits = "maxVisits";
+        double visitsConsumed = 5.0;
+        String maxVisitsResetUtc = "2025-07-31T00:00:00Z";
 
         JSONObject input = new JSONObject(Map.of(
                 "id", "68050bd09890322c57842f6f",
@@ -38,8 +46,8 @@ class SubscriptionSerializerTest {
                         "petclinic", Map.of(
                                 "maxPets", Map.of("consumed", 2),
                                 "maxVisits", Map.of(
-                                        "consumed", 5,
-                                        "resetTimeStamp", "2025-07-31T00:00:00Z"))),
+                                        "consumed", visitsConsumed,
+                                        "resetTimeStamp",  maxVisitsResetUtc))),
                 "contractedServices", Map.of(
                         "zoom", "2025",
                         "petclinic", "2024"),
@@ -70,10 +78,16 @@ class SubscriptionSerializerTest {
                                                 "petsAdoptionCentre", 1))))));
 
         Subscription actual = serializer.fromJson(input);
+
         assertAll(
-                () -> assertEquals(1, actual.getHistory().size()),
-                () -> assertEquals(2, actual.getUsageLevels().size()),
-                () -> assertEquals(2, actual.getServicesMap().size()));
+                () -> assertThat(actual.getHistory()).hasSize(1),
+                () -> assertThat(actual.getUsageLevels()).hasSize(2),
+                () -> assertThat(actual.getServicesMap()).hasSize(2));
+
+        ZonedDateTime maxVisitsExpiration = ZonedDateTime.parse(maxVisitsResetUtc);
+
+        UsageLevel actualLevel = actual.getUsageLevels().get("petclinic").get(maxVisits);
+        assertThat(actualLevel).isEqualTo(UsageLevel.of(maxVisits,visitsConsumed, maxVisitsExpiration));
 
     }
 
