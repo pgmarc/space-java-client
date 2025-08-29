@@ -1,6 +1,6 @@
 package io.github.pgmarc.space.deserializers;
 
-import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,13 +25,12 @@ class SnapshotsDeserializer implements JsonDeserializable<List<Snapshot>> {
         List<Snapshot> res = new ArrayList<>();
         for (int i = 0; i < history.length(); i++) {
             JSONObject snapshot = history.getJSONObject(i);
-            OffsetDateTime startUtc = OffsetDateTime
+            ZonedDateTime startUtc = ZonedDateTime
                     .parse(snapshot.getString(BillingPeriod.Keys.START_DATE.toString()));
-            OffsetDateTime end = OffsetDateTime
+            ZonedDateTime endUtc = ZonedDateTime
                     .parse(snapshot.getString(BillingPeriod.Keys.END_DATE.toString()));
-            res.add(Snapshot.of(startUtc.toLocalDateTime(), end.toLocalDateTime(), servicesDeserializer.fromJson(snapshot)));
+            res.add(Snapshot.of(startUtc, endUtc, servicesDeserializer.fromJson(snapshot)));
         }
         return res;
     }
-
 }

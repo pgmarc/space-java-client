@@ -2,8 +2,6 @@ package io.github.pgmarc.space.contracts;
 
 import static org.assertj.core.api.Assertions.*;
 
-
-import org.eclipse.jetty.server.Authentication;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -35,8 +33,8 @@ public class SubscriptionTest {
         ZonedDateTime snapshotStart = ZonedDateTime.parse("2024-01-01T00:00:00Z");
         ZonedDateTime snapshotEnd = ZonedDateTime.parse("2025-01-01T00:00:00Z");
         Service snapshotService = Service.builder(serviceName, "2024").plan("FREE").build();
-        Subscription.Snapshot snapshot1 = Subscription.Snapshot.of(snapshotStart.toLocalDateTime(),
-            snapshotEnd.toLocalDateTime(), Map.of("petclinic", snapshotService));
+        Subscription.Snapshot snapshot1 = Subscription.Snapshot.of(snapshotStart,
+            snapshotEnd, Map.of("petclinic", snapshotService));
         Set<Subscription.Snapshot> history = Set.of(snapshot1);
 
         Subscription subscription = Subscription.builder(contact, billingPeriod, service)
