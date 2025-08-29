@@ -3,6 +3,7 @@ package io.github.pgmarc.space;
 import io.github.pgmarc.space.deserializers.ErrorDeserializer;
 import io.github.pgmarc.space.deserializers.FeatureEvaluationDeserializer;
 import io.github.pgmarc.space.exceptions.SpaceApiException;
+import io.github.pgmarc.space.features.Revert;
 import io.github.pgmarc.space.features.UsageLimitConsumption;
 import io.github.pgmarc.space.features.FeatureEvaluationResult;
 import io.github.pgmarc.space.serializers.ConsumptionSerializer;
@@ -77,20 +78,6 @@ public final class FeaturesEndpoint {
         return res;
     }
 
-    public enum Revert {
-        OLDEST_VALUE(false),
-        NEWEST_VALUE(true);
-
-        private final boolean latest;
-
-        Revert(boolean latest) {
-            this.latest = latest;
-        }
-
-        public boolean isLatest() {
-            return latest;
-        }
-    }
 
     public boolean revert(String userId, String service, String feature, Revert revert) throws IOException {
         HttpUrl url = this.baseUrl.newBuilder().addEncodedPathSegment(userId)

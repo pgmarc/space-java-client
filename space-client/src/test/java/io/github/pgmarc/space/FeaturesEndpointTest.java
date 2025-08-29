@@ -2,6 +2,7 @@ package io.github.pgmarc.space;
 
 import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
+import io.github.pgmarc.space.features.Revert;
 import io.github.pgmarc.space.features.UsageLimitConsumption;
 import io.github.pgmarc.space.features.FeatureEvaluationResult;
 import okhttp3.HttpUrl;
@@ -102,7 +103,7 @@ class FeaturesEndpointTest {
         String feature = "featureA";
 
         try {
-             assertThat(endpoint.revert(userId, service, feature, FeaturesEndpoint.Revert.NEWEST_VALUE))
+             assertThat(endpoint.revert(userId, service, feature, Revert.NEWEST_VALUE))
                  .isTrue();
         } catch (IOException e) {
             fail();
@@ -128,7 +129,7 @@ class FeaturesEndpointTest {
         String feature = "featureA";
 
         try {
-            assertThat(endpoint.revert(userId, service, feature, FeaturesEndpoint.Revert.OLDEST_VALUE))
+            assertThat(endpoint.revert(userId, service, feature, Revert.OLDEST_VALUE))
                 .isTrue();
         } catch (IOException e) {
             fail();
