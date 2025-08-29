@@ -3,7 +3,6 @@ package io.github.pgmarc.space.contracts;
 import static org.assertj.core.api.Assertions.*;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 import org.junit.jupiter.api.Test;

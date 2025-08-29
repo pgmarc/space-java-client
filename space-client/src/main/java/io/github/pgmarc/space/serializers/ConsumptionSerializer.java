@@ -3,8 +3,6 @@ package io.github.pgmarc.space.serializers;
 import io.github.pgmarc.space.features.Consumption;
 import org.json.JSONObject;
 
-import java.util.stream.Collectors;
-
 public final class ConsumptionSerializer implements JsonSerializable<Consumption> {
 
     private static String formatConsumptionKey(String serviceName, String usageLimitName) {
