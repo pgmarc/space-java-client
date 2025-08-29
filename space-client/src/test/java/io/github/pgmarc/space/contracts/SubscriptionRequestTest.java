@@ -122,7 +122,7 @@ class SubscriptionRequestTest {
     }
 
     @Test
-    void foo() {
+    void givenEmptySubscriptionRequestShouldThrow() {
 
         SubscriptionRequest.Builder builder = SubscriptionRequest.builder(TEST_USER_CONTACT);
 
