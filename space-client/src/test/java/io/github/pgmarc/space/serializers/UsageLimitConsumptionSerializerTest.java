@@ -1,12 +1,12 @@
 package io.github.pgmarc.space.serializers;
 
-import io.github.pgmarc.space.features.Consumption;
+import io.github.pgmarc.space.features.UsageLimitConsumption;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.*;
 
-class ConsumptionSerializerTest {
+class UsageLimitConsumptionSerializerTest {
 
     private final ConsumptionSerializer serializer = new ConsumptionSerializer();
 
@@ -19,20 +19,20 @@ class ConsumptionSerializerTest {
         float barConsumption = 0.1f;
         double consumedSeconds = (double) Float.MAX_VALUE + 1;
 
-        Consumption consumption = Consumption.builder()
-            .addInt(service, "maxPets", petsRegistered)
-            .addLong(service, "fooLimit", fooConsumption)
-            .addDouble(service, "maxSeconds", consumedSeconds)
-            .addFloat(service, "barLimit", barConsumption)
+        UsageLimitConsumption usageLimitConsumption = UsageLimitConsumption.builder(service)
+            .addInt( "maxPets", petsRegistered)
+            .addLong( "fooLimit", fooConsumption)
+            .addDouble("maxSeconds", consumedSeconds)
+            .addFloat("barLimit", barConsumption)
             .build();
 
-        assertThatNoException().isThrownBy(() -> serializer.toJson(consumption));
+        assertThatNoException().isThrownBy(() -> serializer.toJson(usageLimitConsumption));
 
         String intUsageLimit = "petclinic-maxPets";
         String longUsageLimit = "petclinic-fooLimit";
         String floatUsageLimit = "petclinic-barLimit";
         String doubleUsageLimit =  "petclinic-maxSeconds";
-        JSONObject consumptionPayload = serializer.toJson(consumption);
+        JSONObject consumptionPayload = serializer.toJson(usageLimitConsumption);
 
         assertThat(consumptionPayload.keySet()).contains(intUsageLimit, longUsageLimit, floatUsageLimit, doubleUsageLimit);
         assertThat(consumptionPayload.getInt(intUsageLimit)).isEqualTo(petsRegistered);
