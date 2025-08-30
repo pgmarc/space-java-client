@@ -3,25 +3,13 @@ package io.github.pgmarc.space.contracts;
 import static org.assertj.core.api.Assertions.*;
 
 import java.time.Duration;
-import java.time.ZonedDateTime;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class SubscriptionRequestTest {
 
     private static final UserContact TEST_USER_CONTACT = UserContact.builder("123456789", "alexdoe")
             .build();
-
-    private BillingPeriod billingPeriod;
-
-    @BeforeEach
-    void setUp() {
-        ZonedDateTime start = ZonedDateTime.parse("2025-08-15T00:00:00Z");
-        ZonedDateTime end = start.plusDays(30);
-        billingPeriod = BillingPeriod.of(start, end);
-        billingPeriod.setRenewalDays(Duration.ofDays(30));
-    }
 
     @Test
     void givenMultipleServicesInSubscriptionShouldCreate() {

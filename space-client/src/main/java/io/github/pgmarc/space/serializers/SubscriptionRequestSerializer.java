@@ -5,7 +5,6 @@ import java.util.*;
 import org.json.JSONObject;
 
 import io.github.pgmarc.space.contracts.AddOn;
-import io.github.pgmarc.space.contracts.BillingPeriod;
 import io.github.pgmarc.space.contracts.Service;
 import io.github.pgmarc.space.contracts.Subscription;
 import io.github.pgmarc.space.contracts.SubscriptionRequest;
@@ -19,14 +18,14 @@ public class SubscriptionRequestSerializer implements JsonSerializable<Subscript
         JSONObject json = new JSONObject()
                 .put(Subscription.Keys.USER_CONTACT.toString(), userContact(object.getUserContact()))
                 .put(Subscription.Keys.BILLING_PERIOD.toString(),
-                        Map.of(BillingPeriod.Keys.AUTORENEW.toString(), object.getRenewalDays() != null))
+                        Map.of("autoRenew", object.getRenewalDays() != null))
                 .put(Subscription.Keys.CONTRACTED_SERVICES.toString(), contractedServices(object.getServices()))
                 .put(Subscription.Keys.SUBSCRIPTION_PLANS.toString(), subscriptionPlans(object.getServices()))
                 .put(Subscription.Keys.SUBSCRIPTION_ADDONS.toString(), subscriptionAddOns(object.getServices()));
 
         if (object.getRenewalDays() != null) {
             json.getJSONObject(Subscription.Keys.BILLING_PERIOD.toString())
-                    .put(BillingPeriod.Keys.RENEWAL_DAYS.toString(), object.getRenewalDays().toDays());
+                    .put("renewalDays", object.getRenewalDays().toDays());
         }
 
         return json;
