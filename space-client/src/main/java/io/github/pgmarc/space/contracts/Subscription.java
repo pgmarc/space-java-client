@@ -1,9 +1,6 @@
 package io.github.pgmarc.space.contracts;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -19,42 +16,49 @@ public final class Subscription {
 
     private final UserContact userContact;
     private final Map<String, Service> services;
-    private final BillingPeriod billingPeriod;
+    private final ZonedDateTime startDate;
+    private final ZonedDateTime endDate;
+    private final Period renewalPeriod;
     private final List<Snapshot> history;
     private final Map<String, Map<String, UsageLevel>> usageLevels;
 
     private Subscription(Builder builder) {
         this.userContact = builder.userContact;
-        this.billingPeriod = builder.billingPeriod;
+        this.startDate = builder.startDate;
+        this.endDate = builder.endDate;
+        this.renewalPeriod = builder.renewalPeriod;
         this.services = Collections.unmodifiableMap(builder.services);
         this.history = Collections.unmodifiableList(builder.history);
         this.usageLevels = Collections.unmodifiableMap(builder.usageLevels);
     }
 
-    public static Builder builder(UserContact userContact, BillingPeriod billingPeriod,
+    public static Builder builder(UserContact userContact, ZonedDateTime startDate, ZonedDateTime endDate,
             Service service) {
-        return new Builder(userContact, billingPeriod).subscribe(service);
+        return new Builder(userContact, startDate, endDate).subscribe(service);
     }
 
-    public static Builder builder(UserContact userContact, BillingPeriod billingPeriod,
-            Collection<Service> services) {
-        return new Builder(userContact, billingPeriod).subscribeAll(services);
+    public static Builder builder(UserContact userContact, ZonedDateTime startDate, ZonedDateTime endDate, Collection<Service> services) {
+        return new Builder(userContact, startDate, endDate).subscribeAll(services);
     }
 
     public LocalDateTime getStartDate() {
-        return billingPeriod.getStartDate();
+        return startDate.toLocalDateTime();
     }
 
     public LocalDateTime getEndDate() {
-        return billingPeriod.getEndDate();
+        return endDate.toLocalDateTime();
     }
 
-    public Optional<Duration> getRenewalDuration() {
-        return Optional.of(billingPeriod.getDuration());
+    public Optional<Period> getRenewalPeriod() {
+        return Optional.of(renewalPeriod);
     }
 
     public boolean isAutoRenewable() {
-        return billingPeriod.isAutoRenewable();
+        return renewalPeriod != null;
+    }
+
+    public Optional<LocalDateTime> getRenewalDate() {
+        return Optional.ofNullable(isAutoRenewable() ? endDate.plus(renewalPeriod).toLocalDateTime() : null);
     }
 
     /**
@@ -64,7 +68,10 @@ public final class Subscription {
      */
     public boolean isActive(LocalDateTime date) {
         Objects.requireNonNull(date, "date must not be null");
-        return billingPeriod.isActive(ZonedDateTime.of(date, ZoneId.of("UTC")));
+        ZonedDateTime utcDate = ZonedDateTime.of(date, ZoneId.of("UTC"));
+
+        return  (startDate.isEqual(utcDate) || startDate.isBefore(utcDate)) &&
+            (endDate.isAfter(utcDate) || endDate.isEqual(utcDate));
     }
 
     /**
@@ -73,12 +80,10 @@ public final class Subscription {
      */
     public boolean isExpired(LocalDateTime date) {
         Objects.requireNonNull(date, "date must not be null");
-        return billingPeriod.isExpired(ZonedDateTime.of(date, ZoneId.of("UTC")));
+        ZonedDateTime utcDate = ZonedDateTime.of(date, ZoneId.of("UTC"));
+        return startDate.isBefore(utcDate) && endDate.isBefore(utcDate);
     }
 
-    public Optional<LocalDateTime> getRenewalDate() {
-        return billingPeriod.getRenewalDate();
-    }
 
     public String getUserId() {
         return userContact.getUserId();
@@ -131,19 +136,37 @@ public final class Subscription {
 
     public static final class Builder {
 
-        private final BillingPeriod billingPeriod;
+        private final ZonedDateTime startDate;
+        private final ZonedDateTime endDate;
         private final UserContact userContact;
         private final Map<String, Service> services = new HashMap<>();
         private final List<Snapshot> history = new ArrayList<>();
         private final Map<String, Map<String, UsageLevel>> usageLevels = new HashMap<>();
+        private Period renewalPeriod;
 
-        private Builder(UserContact userContact, BillingPeriod billingPeriod) {
-            this.billingPeriod = billingPeriod;
+        private Builder(UserContact userContact, ZonedDateTime startDate, ZonedDateTime endDate) {
+            this.startDate = startDate;
+            this.endDate = endDate;
             this.userContact = userContact;
         }
 
-        public Builder renewIn(Duration renewalDays) {
-            this.billingPeriod.setRenewalDays(renewalDays);
+        public Builder renewIn(Period renewalPeriod) {
+            this.renewalPeriod = renewalPeriod;
+            return this;
+        }
+
+        public Builder renewInDays(int days) {
+            this.renewalPeriod = Period.ofDays(days);
+            return this;
+        }
+
+        public Builder renewInMonths(int months) {
+            this.renewalPeriod = Period.ofMonths(months);
+            return this;
+        }
+
+        public Builder renewInYears(int years) {
+            this.renewalPeriod = Period.ofYears(years);
             return this;
         }
 
@@ -174,9 +197,28 @@ public final class Subscription {
             return this;
         }
 
+        private void validateSubscriptionInterval() {
+            Objects.requireNonNull(startDate, "start date must not be null");
+            Objects.requireNonNull(endDate, "end date must not be null");
+            if (startDate.isAfter(endDate)) {
+                throw new IllegalStateException("startDate is after endDate");
+            }
+        }
+
+        private void validateRenewalPeriod() {
+            if (renewalPeriod != null && renewalPeriod.isZero()) {
+                throw new IllegalArgumentException("your renewal period must not be zero");
+            }
+
+            if (renewalPeriod != null && renewalPeriod.isNegative()) {
+                throw new IllegalStateException("renewal period must not be negative");
+            }
+        }
+
         public Subscription build() {
-            Objects.requireNonNull(billingPeriod, "billingPeriod must not be null");
             Objects.requireNonNull(userContact, "userContact must not be null");
+            validateSubscriptionInterval();
+            validateRenewalPeriod();
             return new Subscription(this);
         }
     }

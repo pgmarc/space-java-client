@@ -6,8 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.Set;
@@ -15,6 +15,8 @@ import java.util.Set;
 class SubscriptionTest {
 
     private static final UserContact TEST_CONTACT = UserContact.builder("123456789", "alex").build();
+    private static final ZonedDateTime START = ZonedDateTime.parse("2025-08-15T00:00:00Z");
+    private static final ZonedDateTime END = START.plusDays(30);
     private static final Service TEST_SERVICE = Service.builder("petclinic", "2025").plan("GOLD").build();
 
     @Test
@@ -23,11 +25,9 @@ class SubscriptionTest {
         String userId = "123456789";
         String username = "alex";
         UserContact contact = UserContact.builder(userId, username).build();
-        ZonedDateTime start = ZonedDateTime.parse("2025-08-28T00:00:00Z");
-        ZonedDateTime end = ZonedDateTime.parse("2025-08-29T00:00:00Z");
+
 
         String serviceName = "petclinic";
-        BillingPeriod billingPeriod = BillingPeriod.of(start, end, Duration.ofDays(45));
         Service service = Service.builder(serviceName, "2025").plan("GOLD").build();
 
         ZonedDateTime snapshotStart = ZonedDateTime.parse("2024-01-01T00:00:00Z");
@@ -37,14 +37,21 @@ class SubscriptionTest {
             snapshotEnd, Map.of("petclinic", snapshotService));
         Set<Subscription.Snapshot> history = Set.of(snapshot1);
 
-        Subscription subscription = Subscription.builder(contact, billingPeriod, service)
+        ZonedDateTime start = ZonedDateTime.parse("2025-08-28T00:00:00Z");
+        ZonedDateTime end = ZonedDateTime.parse("2025-08-29T00:00:00Z");
+        int renewalDays = 45;
+        Period renewalPeriod = Period.ofDays(renewalDays);
+
+        Subscription subscription = Subscription.builder(contact, start, end, service)
+            .renewInDays(renewalDays)
             .addSnapshots(history).build();
 
         assertThat(subscription.getUsername()).isEqualTo(username);
         assertThat(subscription.getStartDate()).isEqualTo(start.toLocalDateTime());
         assertThat(subscription.getEndDate()).isEqualTo(end.toLocalDateTime());
         assertThat(subscription.isAutoRenewable()).isTrue();
-        assertThat(subscription.getRenewalDate()).hasValue(end.plusDays(45).toLocalDateTime());
+        assertThat(subscription.getRenewalPeriod()).hasValue(renewalPeriod);
+        assertThat(subscription.getRenewalDate()).hasValue(end.plusDays(renewalDays).toLocalDateTime());
         assertThat(subscription.getService(serviceName)).hasValue(service);
         assertThat(subscription.getHistory()).contains(snapshot1);
         assertThat(subscription.getHistory().get(0).getStartDate()).isEqualTo(snapshotStart.toLocalDateTime());
@@ -54,12 +61,33 @@ class SubscriptionTest {
     }
 
     @Test
+    void givenRenewalPeriodInDaysShouldCreate() {
+
+        int renewalDays = 45;
+        Subscription subscription = Subscription.builder(TEST_CONTACT, START, END, TEST_SERVICE)
+            .renewInDays(renewalDays)
+            .build();
+
+        assertThat(subscription.getRenewalPeriod()).hasValue(Period.ofDays(renewalDays));
+
+    }
+
+    @Test
+    void givenYearlySubscriptionShouldCreate() {
+        int years = 1;
+        Subscription subscription = Subscription.builder(TEST_CONTACT, START, END, TEST_SERVICE)
+            .renewInYears(years)
+            .build();
+
+        assertThat(subscription.getRenewalPeriod()).hasValue(Period.ofYears(years));
+    }
+
+    @Test
     void givenDateAfterSubscriptionShouldBeExpired() {
 
         ZonedDateTime start = ZonedDateTime.parse("2025-01-01T00:00:00Z");
         ZonedDateTime end =  ZonedDateTime.parse("2025-02-01T00:00:00Z");
-        BillingPeriod period = BillingPeriod.of(start, end);
-        Subscription subscription = Subscription.builder(TEST_CONTACT, period, TEST_SERVICE).build();
+        Subscription subscription = Subscription.builder(TEST_CONTACT, start, end, TEST_SERVICE).build();
 
         LocalDateTime dateToCheck = ZonedDateTime.parse("2025-02-01T00:00:01Z").toLocalDateTime();
         assertThat(subscription.isExpired(dateToCheck)).isTrue();
@@ -77,11 +105,68 @@ class SubscriptionTest {
 
         ZonedDateTime start = ZonedDateTime.parse("2025-01-01T00:00:00Z");
         ZonedDateTime end =  ZonedDateTime.parse("2025-02-01T00:00:00Z");
-        BillingPeriod period = BillingPeriod.of(start, end);
-        Subscription subscription = Subscription.builder(TEST_CONTACT, period, TEST_SERVICE).build();
+        Subscription subscription = Subscription.builder(TEST_CONTACT, start, end, TEST_SERVICE).build();
 
         LocalDateTime dateToCheck = ZonedDateTime.parse(utcDate).toLocalDateTime();
         assertThat(subscription.isExpired(dateToCheck)).isFalse();
         assertThat(subscription.isActive(dateToCheck)).isTrue();
+    }
+
+
+    @Test
+    void givenNegativePeriodShouldThrow() {
+
+        Subscription.Builder builder = Subscription.builder(TEST_CONTACT, START, END, TEST_SERVICE)
+            .renewIn(Period.ofDays(-1));
+
+        assertThatExceptionOfType(IllegalStateException.class)
+            .isThrownBy(builder::build)
+            .withMessage("renewal period must not be negative");
+    }
+
+    @Test
+    void givenStartDateAfterEndDateShouldThrow() {
+
+        ZonedDateTime endDate = START.minusDays(1);
+        Subscription.Builder builder = Subscription.builder(TEST_CONTACT, START, endDate, TEST_SERVICE);
+
+        assertThatExceptionOfType(IllegalStateException.class)
+            .isThrownBy(builder::build)
+            .withMessage("startDate is after endDate");
+    }
+
+    @Test
+    void givenRenewablePeriodSubscriptionShouldBeRenowable() {
+
+        int months = 1;
+        Period period = Period.ofMonths(months);
+
+        Subscription subscription = Subscription.builder(TEST_CONTACT, START, END, TEST_SERVICE)
+            .renewInMonths(months)
+            .build();
+
+        assertThat(subscription.isAutoRenewable()).isTrue();
+        assertThat(subscription.getRenewalPeriod()).hasValue(period);
+        assertThat(subscription.getRenewalDate()).hasValue(END.plus(period).toLocalDateTime());
+    }
+
+    @Test
+    void givenNullStartDateShouldThrow() {
+
+        Subscription.Builder builder = Subscription.builder(TEST_CONTACT, null, END, TEST_SERVICE);
+
+        assertThatExceptionOfType(NullPointerException.class)
+            .isThrownBy(builder::build)
+            .withMessage("start date must not be null");
+    }
+
+    @Test
+    void givenNullEmdDateShouldThrow() {
+
+        Subscription.Builder builder = Subscription.builder(TEST_CONTACT, START, null, TEST_SERVICE);
+
+        assertThatExceptionOfType(NullPointerException.class)
+            .isThrownBy(builder::build)
+            .withMessage("end date must not be null");
     }
 }

@@ -2,6 +2,7 @@ package io.github.pgmarc.space;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.time.Period;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -43,6 +44,7 @@ class ContractsEndpointTest {
     void givenASubscriptionShouldBeCreated() {
 
         String userId = "01c36d29-0d6a-4b41-83e9-8c6d9310c508";
+        int renewalDays = 45;
 
         wm.stubFor(post(urlEqualTo("/contracts"))
                 .withHeader("x-api-key", equalTo(TEST_API_KEY))
@@ -84,7 +86,7 @@ class ContractsEndpointTest {
             subscription = endpoint.addContract(subReq);
             assertThat(subscription.getServices()).isEqualTo(subReq.getServices());
             assertThat(subscription.getUserId()).isEqualTo(userId);
-            assertThat(subscription.getRenewalDuration()).isPresent().hasValue(Duration.ofDays(45));
+            assertThat(subscription.getRenewalPeriod()).hasValue(Period.ofDays(45));
             assertThat(subscription.getHistory()).isEmpty();
         } catch (IOException e) {
             fail();
