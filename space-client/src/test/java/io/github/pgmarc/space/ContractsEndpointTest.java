@@ -68,7 +68,7 @@ class ContractsEndpointTest {
                 .build();
 
         SubscriptionRequest subReq = SubscriptionRequest.builder(userContact)
-                .renewIn(Duration.ofDays(45))
+                .renewIn(Duration.ofDays(renewalDays))
                 .startService("zoom", "2025")
                     .plan("ENTERPRISE")
                     .addOn("extraSeats", 2)
@@ -86,7 +86,7 @@ class ContractsEndpointTest {
             subscription = endpoint.addContract(subReq);
             assertThat(subscription.getServices()).isEqualTo(subReq.getServices());
             assertThat(subscription.getUserId()).isEqualTo(userId);
-            assertThat(subscription.getRenewalPeriod()).hasValue(Period.ofDays(45));
+            assertThat(subscription.getRenewalPeriod()).hasValue(Period.ofDays(renewalDays));
             assertThat(subscription.getHistory()).isEmpty();
         } catch (IOException e) {
             fail();

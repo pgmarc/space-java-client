@@ -2,6 +2,7 @@ package io.github.pgmarc.space.contracts;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.Collection;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -70,9 +71,11 @@ class SubscriptionUpdateRequestTest {
     @Test
     void givenEmptyCollectionOfServicesShouldThrow() {
 
-        SubscriptionUpdateRequest.Builder builder = SubscriptionUpdateRequest.builder();
+        Collection<Service> emptyServices = Set.of();
+        SubscriptionUpdateRequest.Builder builder = SubscriptionUpdateRequest
+            .builder();
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> builder.subscribeAll(Set.of()))
+            .isThrownBy(() -> builder.subscribeAll(emptyServices))
             .withMessage("services must not be empty");
     }
 }
