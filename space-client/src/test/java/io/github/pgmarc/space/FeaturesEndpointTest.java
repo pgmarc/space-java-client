@@ -2,9 +2,9 @@ package io.github.pgmarc.space;
 
 import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
+import io.github.pgmarc.space.features.FeatureEvaluationResult;
 import io.github.pgmarc.space.features.Revert;
 import io.github.pgmarc.space.features.UsageLimitConsumption;
-import io.github.pgmarc.space.features.FeatureEvaluationResult;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import org.junit.jupiter.api.BeforeAll;
@@ -13,8 +13,8 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
-
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 @WireMockTest
 class FeaturesEndpointTest {
@@ -149,7 +149,7 @@ class FeaturesEndpointTest {
                 ok().withBodyFile("pricing-token-response.json")));
 
         try {
-            assertThat(endpoint.generatePricingTokenForUser(userId).length()).isEqualTo(879);
+            assertThat(endpoint.generatePricingTokenForUser(userId)).hasSize(879);
         } catch (IOException e) {
             fail();
         }
