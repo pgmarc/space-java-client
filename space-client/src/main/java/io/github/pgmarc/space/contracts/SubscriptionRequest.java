@@ -16,7 +16,7 @@ public final class SubscriptionRequest {
     private SubscriptionRequest(Builder builder) {
         this.userContact = builder.userContact;
         this.renewalDays = builder.renewalDays;
-        this.services = Collections.unmodifiableSet(builder.services);
+        this.services = builder.services;
     }
 
     public static Builder builder(UserContact userContact) {
@@ -27,8 +27,8 @@ public final class SubscriptionRequest {
         return userContact;
     }
 
-    public Set<Service> getServices() {
-        return services;
+    public Collection<Service> getServices() {
+        return Collections.unmodifiableCollection(services);
     }
 
     public Duration getRenewalDays() {

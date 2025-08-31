@@ -21,12 +21,6 @@ public final class UserContact {
         this.phone = builder.phone;
     }
 
-    public static Builder builder(String userId, String username) {
-        Objects.requireNonNull(userId, "userId must not be null");
-        Objects.requireNonNull(username, "username must not be null");
-        return new Builder(userId, username);
-    }
-
     public String getUserId() {
         return userId;
     }
@@ -52,34 +46,21 @@ public final class UserContact {
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((userId == null) ? 0 : userId.hashCode());
-        result = prime * result + ((username == null) ? 0 : username.hashCode());
-        return result;
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        UserContact that = (UserContact) o;
+        return Objects.equals(userId, that.userId) && Objects.equals(username, that.username);
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        UserContact other = (UserContact) obj;
-        if (userId == null) {
-            if (other.userId != null)
-                return false;
-        } else if (!userId.equals(other.userId))
-            return false;
-        if (username == null) {
-            if (other.username != null)
-                return false;
-        } else if (!username.equals(other.username))
-            return false;
-        return true;
+    public int hashCode() {
+        return Objects.hash(userId, username);
+    }
+
+    public static Builder builder(String userId, String username) {
+        Objects.requireNonNull(userId, "userId must not be null");
+        Objects.requireNonNull(username, "username must not be null");
+        return new Builder(userId, username);
     }
 
     public static class Builder {
@@ -145,7 +126,7 @@ public final class UserContact {
 
         private final String name;
 
-        private Keys(String name) {
+        Keys(String name) {
             this.name = name;
         }
 
