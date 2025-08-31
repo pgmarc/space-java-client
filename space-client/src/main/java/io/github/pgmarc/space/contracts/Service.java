@@ -47,11 +47,6 @@ public final class Service {
     }
 
     @Override
-    public String toString() {
-        return name + ": " + version + " plan" + plan + " addOns " + addOns;
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Service service = (Service) o;
@@ -61,6 +56,16 @@ public final class Service {
     @Override
     public int hashCode() {
         return Objects.hash(name, version, addOns, plan);
+    }
+
+    @Override
+    public String toString() {
+        return "Service{" +
+            "name='" + name + '\'' +
+            ", version='" + version + '\'' +
+            ", addOns=" + addOns +
+            ", plan='" + plan + '\'' +
+            '}';
     }
 
     public static final class Builder {

@@ -39,6 +39,14 @@ public final class FeatureEvaluationResult {
         return new FeatureEvaluationResult(available, quotas);
     }
 
+    @Override
+    public String toString() {
+        return "FeatureEvaluationResult{" +
+            "available=" + available +
+            ", quotas=" + quotas +
+            '}';
+    }
+
     public static final class Usage {
 
         private final Number used;
@@ -59,6 +67,14 @@ public final class FeatureEvaluationResult {
 
         public static Usage of(Number used, Number limit) {
             return new Usage(used, limit);
+        }
+
+        @Override
+        public String toString() {
+            return "Usage{" +
+                "used=" + used +
+                ", limit=" + limit +
+                '}';
         }
     }
 
