@@ -38,7 +38,7 @@ public final class UsageLevel {
     }
 
     public Optional<LocalDateTime> getResetTimestamp() {
-        return resetTimestamp != null ? Optional.of(resetTimestamp.toLocalDateTime()) : Optional.empty();
+        return Optional.ofNullable(resetTimestamp).map(ZonedDateTime::toLocalDateTime);
     }
 
     public boolean isRenewableUsageLimit() {
@@ -51,8 +51,8 @@ public final class UsageLevel {
 
     private static void validateUsageLevel(String name, double consumed) {
         Objects.requireNonNull(name, "usage limit name must not be null");
-        if (consumed <= 0) {
-            throw new IllegalArgumentException("consumption must be greater than 0");
+        if (consumed < 0) {
+            throw new IllegalArgumentException("usage level consumption must be positive");
         }
     }
 
