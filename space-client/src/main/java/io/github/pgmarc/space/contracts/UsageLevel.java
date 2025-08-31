@@ -76,4 +76,13 @@ public final class UsageLevel {
     public int hashCode() {
         return Objects.hash(name, consumed, resetTimestamp);
     }
+
+    @Override
+    public String toString() {
+        return "UsageLevel{" +
+            "name='" + name + '\'' +
+            ", consumed=" + consumed +
+            ", resetTimestamp=" + resetTimestamp +
+            '}';
+    }
 }

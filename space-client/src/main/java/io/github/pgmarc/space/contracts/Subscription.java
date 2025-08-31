@@ -123,6 +123,18 @@ public final class Subscription {
 
     }
 
+    @Override
+    public String toString() {
+        return "Subscription{" +
+            "userContact=" + userContact +
+            ", services=" + services +
+            ", startDate=" + startDate +
+            ", endDate=" + endDate +
+            ", renewalPeriod=" + renewalPeriod +
+            ", history=" + history +
+            ", usageLevels=" + usageLevels +
+            '}';
+    }
 
     public enum Keys {
         USER_CONTACT("userContact"),
@@ -266,6 +278,27 @@ public final class Subscription {
         public static Snapshot of(ZonedDateTime startDateTime, ZonedDateTime endDateTime,
                                   Map<String, Service> services) {
             return new Snapshot(startDateTime, endDateTime, services);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == null || getClass() != o.getClass()) return false;
+            Snapshot snapshot = (Snapshot) o;
+            return Objects.equals(starDateTime, snapshot.starDateTime) && Objects.equals(endDateTime, snapshot.endDateTime) && Objects.equals(services, snapshot.services);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(starDateTime, endDateTime, services);
+        }
+
+        @Override
+        public String toString() {
+            return "Snapshot{" +
+                "starDateTime=" + starDateTime +
+                ", endDateTime=" + endDateTime +
+                ", services=" + services +
+                '}';
         }
     }
 }

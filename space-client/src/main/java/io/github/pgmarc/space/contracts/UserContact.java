@@ -57,6 +57,18 @@ public final class UserContact {
         return Objects.hash(userId, username);
     }
 
+    @Override
+    public String toString() {
+        return "UserContact{" +
+            "userId='" + userId + '\'' +
+            ", username='" + username + '\'' +
+            ", firstName='" + firstName + '\'' +
+            ", lastName='" + lastName + '\'' +
+            ", email='" + email + '\'' +
+            ", phone='" + phone + '\'' +
+            '}';
+    }
+
     public static Builder builder(String userId, String username) {
         Objects.requireNonNull(userId, "userId must not be null");
         Objects.requireNonNull(username, "username must not be null");

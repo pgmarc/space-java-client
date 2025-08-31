@@ -31,4 +31,12 @@ public final class AddOn {
     public int hashCode() {
         return Objects.hash(name, quantity);
     }
+
+    @Override
+    public String toString() {
+        return "AddOn{" +
+            "name='" + name + '\'' +
+            ", quantity=" + quantity +
+            '}';
+    }
 }
