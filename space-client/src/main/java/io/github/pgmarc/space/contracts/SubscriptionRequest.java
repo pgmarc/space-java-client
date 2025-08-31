@@ -61,6 +61,9 @@ public final class SubscriptionRequest {
         }
 
         public Builder renewInDays(int days) {
+            if (days < 1) {
+                throw new IllegalArgumentException("renewal period given in days must be positive");
+            }
             this.renewalPeriod = Period.ofDays(days);
             return this;
         }
