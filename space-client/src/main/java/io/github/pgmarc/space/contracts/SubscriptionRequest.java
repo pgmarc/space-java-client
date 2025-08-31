@@ -1,6 +1,6 @@
 package io.github.pgmarc.space.contracts;
 
-import java.time.Duration;
+import java.time.Period;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -11,11 +11,11 @@ public final class SubscriptionRequest {
 
     private final UserContact userContact;
     private final Set<Service> services;
-    private final Duration renewalDays;
+    private final Period renewalPeriod;
 
     private SubscriptionRequest(Builder builder) {
         this.userContact = builder.userContact;
-        this.renewalDays = builder.renewalDays;
+        this.renewalPeriod = builder.renewalPeriod;
         this.services = builder.services;
     }
 
@@ -31,8 +31,8 @@ public final class SubscriptionRequest {
         return Collections.unmodifiableCollection(services);
     }
 
-    public Duration getRenewalDays() {
-        return renewalDays;
+    public Period getRenewalPeriod() {
+        return renewalPeriod;
     }
 
     public static final class Builder {
@@ -40,7 +40,7 @@ public final class SubscriptionRequest {
         private final UserContact userContact;
         private final Set<Service> services = new HashSet<>();
         private Service.Builder serviceBuilder;
-        private Duration renewalDays;
+        private Period renewalPeriod;
 
         private Builder(UserContact userContact) {
             this.userContact = userContact;
@@ -53,12 +53,15 @@ public final class SubscriptionRequest {
 
         public Builder subscribeAll(Collection<Service> services) {
             Objects.requireNonNull(services, "services must not be null");
+            if (services.isEmpty()) {
+                throw  new IllegalArgumentException("services must not be empty");
+            }
             this.services.addAll(services);
             return this;
         }
 
-        public Builder renewIn(Duration renewalDays) {
-            this.renewalDays = renewalDays;
+        public Builder renewInDays(int days) {
+            this.renewalPeriod = Period.ofDays(days);
             return this;
         }
 

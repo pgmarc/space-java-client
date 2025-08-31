@@ -68,7 +68,7 @@ class ContractsEndpointTest {
                 .build();
 
         SubscriptionRequest subReq = SubscriptionRequest.builder(userContact)
-                .renewIn(Duration.ofDays(renewalDays))
+                .renewInDays(renewalDays)
                 .startService("zoom", "2025")
                     .plan("ENTERPRISE")
                     .addOn("extraSeats", 2)

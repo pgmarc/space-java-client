@@ -2,9 +2,10 @@ package io.github.pgmarc.space.contracts;
 
 import static org.assertj.core.api.Assertions.*;
 
-import java.time.Duration;
 
 import org.junit.jupiter.api.Test;
+
+import java.util.Set;
 
 class SubscriptionRequestTest {
 
@@ -14,7 +15,7 @@ class SubscriptionRequestTest {
     @Test
     void givenMultipleServicesInSubscriptionShouldCreate() {
 
-        long renewalDays = 30;
+        int renewalDays = 30;
         String service1Name = "Petclinic";
         String service2Name = "Petclinic Labs";
 
@@ -25,10 +26,20 @@ class SubscriptionRequestTest {
                 .builder(TEST_USER_CONTACT)
                 .subscribe(service1)
                 .subscribe(service2)
-                .renewIn(Duration.ofDays(renewalDays))
+                .renewInDays(renewalDays)
                 .build();
 
         assertThat(sub.getServices()).contains(service1, service2);
+    }
+
+    @Test
+    void givenEmptyCollectionOfAddOnsShouldThrow() {
+        SubscriptionRequest.Builder builder = SubscriptionRequest
+            .builder(TEST_USER_CONTACT);
+        Set<Service> emptyServices = Set.of();
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> builder.subscribeAll(emptyServices))
+            .withMessage("services must not be empty");
     }
 
     @Test
@@ -89,11 +100,10 @@ class SubscriptionRequestTest {
     void givenOptionalRenewalDaysShouldNotThrow() {
 
         SubscriptionRequest subReq = SubscriptionRequest.builder(TEST_USER_CONTACT)
-                .renewIn(null)
                 .startService("foo", "bar").plan("baz")
                 .endService().build();
 
-        assertThat(subReq.getRenewalDays()).isNull();
+        assertThat(subReq.getRenewalPeriod()).isNull();
 
     }
 
@@ -101,7 +111,6 @@ class SubscriptionRequestTest {
     void givenNoEndServiceShouldThrow() {
 
         SubscriptionRequest.Builder builder = SubscriptionRequest.builder(TEST_USER_CONTACT)
-                .renewIn(null)
                 .startService("foo", "bar").plan("baz");
 
         assertThatExceptionOfType(IllegalStateException.class)

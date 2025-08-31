@@ -1,5 +1,6 @@
 package io.github.pgmarc.space.serializers;
 
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 import org.json.JSONObject;
@@ -18,14 +19,14 @@ public class SubscriptionRequestSerializer implements JsonSerializable<Subscript
         JSONObject json = new JSONObject()
                 .put(Subscription.Keys.USER_CONTACT.toString(), userContact(object.getUserContact()))
                 .put(Subscription.Keys.BILLING_PERIOD.toString(),
-                        Map.of("autoRenew", object.getRenewalDays() != null))
+                        Map.of("autoRenew", object.getRenewalPeriod() != null))
                 .put(Subscription.Keys.CONTRACTED_SERVICES.toString(), contractedServices(object.getServices()))
                 .put(Subscription.Keys.SUBSCRIPTION_PLANS.toString(), subscriptionPlans(object.getServices()))
                 .put(Subscription.Keys.SUBSCRIPTION_ADDONS.toString(), subscriptionAddOns(object.getServices()));
 
-        if (object.getRenewalDays() != null) {
+        if (object.getRenewalPeriod() != null) {
             json.getJSONObject(Subscription.Keys.BILLING_PERIOD.toString())
-                    .put("renewalDays", object.getRenewalDays().toDays());
+                    .put("renewalDays", object.getRenewalPeriod().getDays());
         }
 
         return json;
