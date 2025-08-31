@@ -42,7 +42,7 @@ public class SubscriptionRequestSerializer implements JsonSerializable<Subscript
         return res;
     }
 
-    public static Map<String, String> contractedServices(Set<Service> services) {
+    public static Map<String, String> contractedServices(Collection<Service> services) {
         Map<String, String> res = new HashMap<>();
         for (Service service : services) {
             res.put(service.getName(), service.getVersion());
@@ -50,7 +50,7 @@ public class SubscriptionRequestSerializer implements JsonSerializable<Subscript
         return Collections.unmodifiableMap(res);
     }
 
-    public static Map<String, String> subscriptionPlans(Set<Service> services) {
+    public static Map<String, String> subscriptionPlans(Collection<Service> services) {
         Map<String, String> res = new HashMap<>();
         for (Service service : services) {
             Optional<String> plan = service.getPlan();
@@ -63,7 +63,7 @@ public class SubscriptionRequestSerializer implements JsonSerializable<Subscript
 
     }
 
-    public static Map<String, Map<String, Long>> subscriptionAddOns(Set<Service> services) {
+    public static Map<String, Map<String, Long>> subscriptionAddOns(Collection<Service> services) {
 
         Map<String, Map<String, Long>> res = new HashMap<>();
 

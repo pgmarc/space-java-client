@@ -84,7 +84,7 @@ class ContractsEndpointTest {
         Subscription subscription;
         try {
             subscription = endpoint.addContract(subReq);
-            assertThat(subscription.getServices()).isEqualTo(subReq.getServices());
+            assertThat(subscription.getServices()).containsAll(subReq.getServices());
             assertThat(subscription.getUserId()).isEqualTo(userId);
             assertThat(subscription.getRenewalPeriod()).hasValue(Period.ofDays(renewalDays));
             assertThat(subscription.getHistory()).isEmpty();

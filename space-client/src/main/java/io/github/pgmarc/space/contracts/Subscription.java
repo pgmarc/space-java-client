@@ -1,15 +1,10 @@
 package io.github.pgmarc.space.contracts;
 
-import java.time.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.time.Period;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public final class Subscription {
@@ -24,12 +19,12 @@ public final class Subscription {
 
     private Subscription(Builder builder) {
         this.userContact = builder.userContact;
+        this.services = builder.services;
         this.startDate = builder.startDate;
         this.endDate = builder.endDate;
         this.renewalPeriod = builder.renewalPeriod;
-        this.services = Collections.unmodifiableMap(builder.services);
-        this.history = Collections.unmodifiableList(builder.history);
-        this.usageLevels = Collections.unmodifiableMap(builder.usageLevels);
+        this.history = builder.history;
+        this.usageLevels = builder.usageLevels;
     }
 
     public static Builder builder(UserContact userContact, ZonedDateTime startDate, ZonedDateTime endDate,
@@ -39,6 +34,14 @@ public final class Subscription {
 
     public static Builder builder(UserContact userContact, ZonedDateTime startDate, ZonedDateTime endDate, Collection<Service> services) {
         return new Builder(userContact, startDate, endDate).subscribeAll(services);
+    }
+
+    public String getUserId() {
+        return userContact.getUserId();
+    }
+
+    public String getUsername() {
+        return userContact.getUsername();
     }
 
     public LocalDateTime getStartDate() {
@@ -58,7 +61,8 @@ public final class Subscription {
     }
 
     public Optional<LocalDateTime> getRenewalDate() {
-        return Optional.ofNullable(isAutoRenewable() ? endDate.plus(renewalPeriod).toLocalDateTime() : null);
+        return Optional.ofNullable(renewalPeriod)
+            .map( renewalPeriod -> endDate.plus(renewalPeriod).toLocalDateTime());
     }
 
     /**
@@ -84,34 +88,41 @@ public final class Subscription {
         return startDate.isBefore(utcDate) && endDate.isBefore(utcDate);
     }
 
-
-    public String getUserId() {
-        return userContact.getUserId();
+    public Map<String, Service> getServicesMap() {
+        return Collections.unmodifiableMap(services);
     }
 
-    public String getUsername() {
-        return userContact.getUsername();
+    public Collection<Service> getServices() {
+        return Collections.unmodifiableCollection(services.values());
     }
 
     public Optional<Service> getService(String serviceName) {
         return Optional.ofNullable(this.services.get(serviceName));
     }
 
-    public Map<String, Service> getServicesMap() {
-        return services;
-    }
-
-    public Set<Service> getServices() {
-        return Set.copyOf(services.values());
-    }
-
     public List<Snapshot> getHistory() {
-        return history;
+        return Collections.unmodifiableList(history);
     }
 
     public Map<String, Map<String, UsageLevel>> getUsageLevels() {
-        return usageLevels;
+        return Collections.unmodifiableMap(usageLevels);
     }
+
+    public Optional<Map<String, UsageLevel>> getServiceUsageLevels(String service) {
+        Objects.requireNonNull(service, "service name must not be null");
+        return Optional.ofNullable(usageLevels.get(service));
+    }
+
+    public Optional<UsageLevel> getUsageLevel(String service, String usageLimit) {
+        Objects.requireNonNull(service, "service name must not be null");
+        Objects.requireNonNull(usageLimit, "usage limit name must not be null");
+        if (!usageLevels.containsKey(service)) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(usageLevels.get(service).get(usageLimit));
+
+    }
+
 
     public enum Keys {
         USER_CONTACT("userContact"),

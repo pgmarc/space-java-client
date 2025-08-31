@@ -44,7 +44,8 @@ class SubscriptionTest {
 
         Subscription subscription = Subscription.builder(contact, start, end, service)
             .renewInDays(renewalDays)
-            .addSnapshots(history).build();
+            .addSnapshots(history)
+            .build();
 
         assertThat(subscription.getUsername()).isEqualTo(username);
         assertThat(subscription.getStartDate()).isEqualTo(start.toLocalDateTime());
@@ -58,6 +59,69 @@ class SubscriptionTest {
         assertThat(subscription.getHistory().get(0).getEndDate()).isEqualTo(snapshotEnd.toLocalDateTime());
         assertThat(subscription.getHistory().get(0).getServices()).isNotEmpty();
         assertThat(subscription.getHistory().get(0).getService(serviceName)).hasValue(snapshotService);
+    }
+
+    @Test
+    void givenUsageLevelsShouldCreateSubscription() {
+
+        String petclinic = "petclinic";
+        String maxPets = "maxPets";
+        double registeredPets = 3;
+        UsageLevel ulMaxPets = UsageLevel.of(maxPets, registeredPets);
+
+        String petclinicAI = "petclinic-ai";
+        String maxTokens = "maxTokens";
+        ZonedDateTime reset = ZonedDateTime.parse("2025-02-01T00:00:00Z");
+        UsageLevel ulMaxTokens =  UsageLevel.of(maxTokens, 20, reset);
+        Map<String, Map<String, UsageLevel>> usageLevels =
+            Map.of(petclinic, Map.of(maxPets, ulMaxPets),
+                petclinicAI, Map.of(maxTokens,ulMaxTokens));
+        Subscription subscription = Subscription.builder(TEST_CONTACT, START, END, TEST_SERVICE)
+            .addUsageLevels(usageLevels)
+            .build();
+
+        assertThat(subscription.getServiceUsageLevels(petclinic)).isNotEmpty();
+        assertThat(subscription.getUsageLevel(petclinic, maxPets)).hasValue(ulMaxPets);
+    }
+
+    @Test
+    void givenNullServiceShouldBeEmptyServiceUsageLevels() {
+
+        String petclinic = "petclinic";
+        String maxPets = "maxPets";
+        double registeredPets = 3;
+        UsageLevel ulMaxPets = UsageLevel.of(maxPets, registeredPets);
+
+        Map<String, Map<String, UsageLevel>> usageLevels = Map.of(petclinic, Map.of(maxPets, ulMaxPets));
+        Subscription subscription = Subscription.builder(TEST_CONTACT, START, END, TEST_SERVICE)
+            .addUsageLevels(usageLevels)
+            .build();
+
+        assertThatExceptionOfType(NullPointerException.class)
+            .isThrownBy(() -> subscription.getServiceUsageLevels(null))
+            .withMessage("service name must not be null");
+    }
+
+    @Test
+    void givenNullUsageLimitShouldBeEmptyUsageLevel() {
+
+        String petclinic = "petclinic";
+        String maxPets = "maxPets";
+        double registeredPets = 3;
+        UsageLevel ulMaxPets = UsageLevel.of(maxPets, registeredPets);
+
+        Map<String, Map<String, UsageLevel>> usageLevels = Map.of(petclinic, Map.of(maxPets, ulMaxPets));
+        Subscription subscription = Subscription.builder(TEST_CONTACT, START, END, TEST_SERVICE)
+            .addUsageLevels(usageLevels)
+            .build();
+
+        assertThatExceptionOfType(NullPointerException.class)
+            .isThrownBy(() -> subscription.getUsageLevel(null, maxPets))
+            .withMessage("service name must not be null");
+
+        assertThatExceptionOfType(NullPointerException.class)
+            .isThrownBy(() -> subscription.getUsageLevel(petclinic, null))
+            .withMessage("usage limit name must not be null");
     }
 
     @Test
