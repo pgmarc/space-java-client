@@ -33,6 +33,17 @@ class SubscriptionRequestTest {
     }
 
     @Test
+    void givenNegativeRenewalDaysShouldThrow() {
+        SubscriptionRequest.Builder builder = SubscriptionRequest
+            .builder(TEST_USER_CONTACT);
+        Set<Service> emptyServices = Set.of();
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> builder.renewInDays(0))
+            .withMessage("renewal period given in days must be positive");
+
+    }
+
+    @Test
     void givenEmptyCollectionOfAddOnsShouldThrow() {
         SubscriptionRequest.Builder builder = SubscriptionRequest
             .builder(TEST_USER_CONTACT);
