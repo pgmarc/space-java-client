@@ -17,7 +17,7 @@ HTTP REST client implemented in Java for Subscription and Pricing Access Control
   - SPACE URL path prefix (optional, by default space is under `api/v1`, i.e., `http://example.com/api/v1`)
   - Read and write timeout of HTTP client (optional, uses OkHTTP client under the hood)
 
-SPACE client implements the following operations of [SPACE OAS](space-oas):
+SPACE client implements the following operations of [SPACE OAS](https://github.com/Alex-GF/space/blob/main/api/docs/space-api-docs.yaml):
 
 - `POST /contracts`
 - `GET /contracts/{userId}`
@@ -57,7 +57,7 @@ Before using `SpaceClient` you will need to do the following:
 2. Get the corresponding api key for the required role
 3. As `MANAGER` or `ADMIN` add a service in SPACE by uploading a pricing in `Pricing2Yaml` format specification
 
-See [Pricing4SaaS docs](pricing4saas-docs) for more information.
+See [Pricing4SaaS docs](https://sphere-docs.vercel.app) for more information.
 
 > [!WARNING]
 > API Keys are secrets and should be kept safe end encrypted.
@@ -98,7 +98,4 @@ These are just some examples, but you can find more in `examples` directory.
 
 ### Documentation
 
-You read more documentation about SPACE in [Pricing4SaaS docs](pricing4saas-docs).
-
-[pricing4saas-docs]: https://pricing4saas-docs.vercel.app/
-[space-oas]: https://github.com/Alex-GF/space/blob/docs/oas/api/docs/space-api-docs.yaml
+You read more documentation about SPACE in [SPHERE docs](https://sphere-docs.vercel.app).
